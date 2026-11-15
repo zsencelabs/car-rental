@@ -1,62 +1,154 @@
-# Project: Hybrid Rental Marketplace — Audit Workspace
 
-## Purpose
-Evaluate the BookCars open-source car-rental platform against a hybrid
-marketplace where customers book either self-drive vehicles or vehicles with
-independent drivers. This repository is initially an audit and decision workspace,
-not the production application.
+# Hybrid Rental Platform
 
-## Business assumptions to validate
-- Rental companies list and supply vehicles; they do not supply drivers.
-- Drivers are independent marketplace participants.
-- Booking modes: `SELF_DRIVE` and `WITH_DRIVER`.
-- Vehicle and driver availability are distinct resources.
-- With-driver bookings require an eligible vehicle and an independently
-  onboarded, approved, available driver.
-- Recommendations are advisory; eligibility and availability are rechecked
-  at confirmation.
-- Payments, refunds, commissions, and payouts must be traceable and auditable.
+## Project Overview
 
-Do not silently convert assumptions into requirements. Record questions and
-decisions in `docs/`.
+A hybrid car rental and independent driver marketplace.
 
-## Working method
-1. Inspect before changing. For the initial BookCars audit, work read-only.
-2. Plan non-trivial work before implementation. State scope, evidence, risks,
-   files to inspect/change, and acceptance criteria.
-3. Prefer small, reviewable tasks over broad one-shot implementation prompts.
-4. Verify claims against source code, tests, migrations, CI, and deployment files.
-   README claims alone are not proof of implementation.
-5. Distinguish confirmed facts, inferences, assumptions, and unknowns.
-6. Cite repository-relative file paths and relevant symbols in audit findings.
-7. Do not invent features, APIs, environment variables, test results, or commands.
-8. Ask before destructive actions, dependency installation, migrations,
-   deployment, or pushing changes.
+The platform supports:
+1. Rental companies managing their own fleets.
+2. Individual owners listing vehicles.
+3. Independent professional drivers.
+4. Customers booking self-drive rentals.
+5. Customers booking vehicles with independently selected drivers.
 
-## Architecture and engineering principles
-- Favor explicit domain boundaries and clear ownership of business rules.
-- Keep booking, availability, pricing, and financial invariants server-side.
-- Treat money as decimal/minor-unit values with explicit currency; never use
-  binary floating-point for financial calculations.
-- Store timestamps consistently (normally UTC) and make the business timezone
-  explicit for date-based rental rules.
-- Prevent overlapping confirmed reservations under concurrent requests; a
-  check-then-insert sequence without transaction-safe protection is insufficient.
-- Make payment webhooks idempotent and verify signatures.
-- Keep audit trails for state transitions and financial adjustments.
-- Enforce authorization on the server, not only in the UI.
-- Validate all untrusted input at system boundaries.
-- Do not log credentials, payment secrets, or unnecessary personal data.
+## Business Rules
 
-## Audit deliverables
-- Architecture and repository map.
-- Feature compatibility matrix.
-- Booking lifecycle and data-model trace.
-- Driver marketplace gap analysis.
-- Security, testing, operations, and dependency review.
-- Extend-vs-rebuild recommendation with evidence, risks, and trade-offs.
-- ADR documenting the final decision.
+- Vehicle ownership and driver services are independent.
+- Rental companies do not provide drivers.
+- Individual vehicle owners do not provide drivers.
+- Drivers register and operate independently.
+- A booking must have exactly one rental mode:
+  SELF_DRIVE or WITH_DRIVER.
+- SELF_DRIVE requires customer driving-license eligibility.
+- WITH_DRIVER requires an eligible vehicle and an assigned driver.
+- Vehicle and driver availability must be checked independently.
+- Never allow overlapping confirmed vehicle reservations.
+- Never allow overlapping confirmed driver assignments.
+- Vehicle earnings and driver earnings must be calculated separately.
+- Security deposits are not rental revenue.
+- All booking and financial changes must be auditable.
 
-## Communication
-Be direct and precise. Explain unfamiliar concepts briefly. Flag uncertainty.
-Do not claim the project is production-ready merely because it builds.
+See docs/requirements/ for the complete requirements.
+See docs/architecture/ for architectural decisions.
+See docs/business-rules/ for detailed business logic.
+
+## Technology Stack
+
+- TypeScript
+- Next.js
+- NestJS
+- PostgreSQL
+- Prisma
+- Redis
+- pnpm workspaces
+- Turborepo
+- Tailwind CSS
+- shadcn/ui
+- TanStack Query
+- Zod
+- Vitest
+- Playwright
+- Docker
+
+## Architecture Rules
+
+- Use modular architecture.
+- Keep business logic out of controllers.
+- Use dependency injection in NestJS.
+- Separate domain logic from infrastructure.
+- Use DTOs for API boundaries.
+- Validate all external input.
+- Use transactions for financial and booking operations.
+- Use database constraints where appropriate.
+- Avoid circular dependencies.
+- Avoid duplicated business logic.
+- Never introduce unnecessary abstractions.
+
+## Coding Standards
+
+- Strict TypeScript.
+- Avoid `any`.
+- Prefer small, focused functions.
+- Use meaningful variable and function names.
+- Follow existing project conventions.
+- Reuse shared validation schemas where appropriate.
+- Handle errors explicitly.
+- Avoid silent failures.
+- Keep components modular.
+- Avoid unnecessary dependencies.
+
+## Database Rules
+
+- PostgreSQL is the source of truth.
+- Use Prisma migrations.
+- Never modify the production database schema manually.
+- Never reset a database containing valuable data.
+- Use appropriate indexes and constraints.
+- Use decimal-safe representations for monetary values.
+- Store timestamps consistently in UTC.
+- Keep financial records immutable where possible.
+- Use explicit transaction boundaries.
+
+## API Rules
+
+- Follow REST conventions.
+- Use consistent response structures.
+- Validate request parameters, body, and query strings.
+- Implement pagination for collection endpoints.
+- Apply authorization to every protected operation.
+- Document endpoints using OpenAPI.
+- Never expose internal database models directly.
+
+## Security Rules
+
+- Never commit secrets.
+- Never expose passwords, tokens, or private documents.
+- Never trust client-side pricing calculations.
+- Verify payment transactions on the backend.
+- Enforce ownership and role permissions server-side.
+- Use least-privilege access.
+- Treat external API responses as untrusted.
+
+## Testing Rules
+
+- Test all critical business logic.
+- Add unit tests for domain services.
+- Add integration tests for API and database operations.
+- Add E2E tests for critical customer journeys.
+- Test booking overlap and concurrency.
+- Test payment and refund calculations.
+- Never claim tests passed without executing them.
+
+## Development Workflow
+
+Before implementing a feature:
+
+1. Understand the requirements.
+2. Inspect existing code.
+3. Identify affected modules.
+4. Check business rules.
+5. Prepare an implementation plan.
+6. Identify required tests.
+7. Implement incrementally.
+8. Run relevant tests.
+9. Review security and edge cases.
+10. Update documentation.
+
+## Git Rules
+
+- Never work directly on main.
+- Use feature branches.
+- Use conventional commits.
+- Do not overwrite user changes.
+- Do not force push without explicit approval.
+- Do not commit without permission.
+- Keep pull requests focused.
+
+## Important
+
+Do not make major architectural decisions without documenting them.
+
+If requirements are unclear, ask before implementing.
+
+Prefer correctness, security, maintainability, and testability over implementation speed.
