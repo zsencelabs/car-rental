@@ -1,0 +1,45 @@
+
+Read the project's audit instructions and requirements.
+
+Perform the initial BookCars audit using the
+bookcars-audit skill.
+
+Work in read-only mode. Do not modify any source files.
+Inspect the actual implementation and produce an
+evidence-based compatibility report.
+
+I want an honest recommendation:
+Should I extend BookCars or build my platform from scratch?
+
+
+
+
+
+-----------------------------------------------------------------------------
+
+
+
+I have added the initial Software Requirements Specification (SRS) for my Hybrid Car Rental & Driver Marketplace Platform.
+
+Before writing any application code, I want you to thoroughly understand the complete project.
+
+Your responsibilities:
+
+1. Read the complete SRS.
+2. Understand the business model, user roles, workflows, and business rules.
+3. Identify missing requirements, ambiguous statements, contradictions, and technical risks.
+4. Identify important unanswered business decisions.
+5. Separate MVP features from future enhancements.
+6. Evaluate whether the requirements are sufficiently clear for architecture and database design.
+7. Review the existing Claude Code project instructions and suggest improvements where necessary.
+
+Important rules:
+- Do not write application code.
+- Do not generate database migrations.
+- Do not invent business requirements.
+- Do not silently change my original SRS.
+- Clearly distinguish confirmed requirements from assumptions and recommendations.
+
+Create a detailed requirements analysis report in docs/requirements/requirements-analysis.md.
+
+At the end, provide a prioritized list of questions that I must answer before finalizing the architecture.
