@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import { parseSearchParams } from "@/lib/search-schema";
 import { drivers, vehicles } from "./mock-data";
 import { compareMoney, toMinorUnits } from "./money";
-import { filterAndSortVehicles, getRecommendedDrivers, getVehicle, rankDriversForCity } from "./queries";
+import {
+  filterAndSortVehicles,
+  getBestWeeklySaving,
+  getRecommendedDrivers,
+  getVehicle,
+  listFeaturedDrivers,
+  rankDriversForCity,
+} from "./queries";
 
 describe("money helpers", () => {
   it("converts decimal strings to minor units without floats", () => {
@@ -65,6 +72,17 @@ describe("filterAndSortVehicles", () => {
     expect(results.slice(firstNonFeatured).every((v) => !v.featured)).toBe(true);
   });
 
+  it("filters by brand and minimum rating", () => {
+    expect(search({ brand: "Toyota" }).every((v) => v.brand === "Toyota")).toBe(true);
+    expect(search({ brand: "Toyota" }).length).toBeGreaterThan(0);
+    expect(search({ minRating: "4.8" }).every((v) => v.rating >= 4.8)).toBe(true);
+  });
+
+  it("sorts by popularity (review count)", () => {
+    const counts = search({ sort: "popular" }).map((v) => v.reviewCount);
+    expect(counts).toEqual([...counts].sort((a, b) => b - a));
+  });
+
   it("returns an empty list when nothing matches", () => {
     expect(search({ mode: "WITH_DRIVER", fuel: "electric" })).toEqual([]);
   });
@@ -93,5 +111,40 @@ describe("driver recommendations (preview)", () => {
     for (const driver of drivers) {
       expect(Object.keys(driver)).not.toContain("licenseNumber");
     }
+  });
+});
+
+describe("weekly saving promo", () => {
+  it("computes the saving from rates without floating-point money", async () => {
+    const saving = await getBestWeeklySaving();
+    expect(saving).toBeDefined();
+    const daily = toMinorUnits(saving!.vehicle.dailyRate.amount) * 7n;
+    const weekly = toMinorUnits(saving!.vehicle.weeklyRate.amount);
+    expect(saving!.percent).toBe(Number(((daily - weekly) * 100n) / daily));
+    expect(saving!.percent).toBeGreaterThan(0);
+  });
+});
+
+describe("catalog data integrity", () => {
+  it("gives every vehicle at least one exterior photo and a non-empty alt text", () => {
+    for (const vehicle of vehicles) {
+      expect(vehicle.images.some((image) => image.kind === "exterior")).toBe(true);
+      expect(vehicle.images.every((image) => image.alt.length > 0)).toBe(true);
+    }
+  });
+
+  it("uses valid, ordered sample booked ranges", () => {
+    for (const vehicle of vehicles) {
+      for (const range of vehicle.bookedRanges) {
+        expect(range.start <= range.end).toBe(true);
+      }
+    }
+  });
+
+  it("only features available drivers, best performance first", async () => {
+    const featured = await listFeaturedDrivers(4);
+    expect(featured.every((driver) => driver.available)).toBe(true);
+    const scores = featured.map((driver) => driver.performanceScore);
+    expect(scores).toEqual([...scores].sort((a, b) => b - a));
   });
 });

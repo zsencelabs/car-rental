@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { HowItWorksSteps } from "@/components/site/how-it-works-steps";
+import { HowItWorksStory } from "@/components/site/how-it-works-story";
 import { PageContainer, PageIntro } from "@/components/site/page-intro";
 
 export const metadata: Metadata = {
@@ -48,8 +48,10 @@ export default function HowItWorksPage() {
         ))}
       </div>
 
-      <h2 className="section-title mt-16 text-3xl">Three steps to the road</h2>
-      <HowItWorksSteps className="mt-6" />
+      <h2 className="section-title mt-20 text-3xl">From search to the open road</h2>
+      <div className="mt-4">
+        <HowItWorksStory />
+      </div>
 
       <Button asChild size="lg" className="mt-10">
         <Link href="/cars">Find a car</Link>

@@ -18,6 +18,7 @@ const selectClass =
 interface CarFiltersProps {
   params: SearchParams;
   locations: Location[];
+  brands: string[];
   /** Keeps input ids unique when the form is rendered twice (mobile + desktop). */
   idPrefix: string;
   className?: string;
@@ -27,7 +28,7 @@ interface CarFiltersProps {
  * Plain GET form: works without JavaScript and keeps every filter in the URL,
  * so results are shareable and the back button behaves as expected.
  */
-export function CarFilters({ params, locations, idPrefix, className }: CarFiltersProps) {
+export function CarFilters({ params, locations, brands, idPrefix, className }: CarFiltersProps) {
   const id = (name: string) => `${idPrefix}-${name}`;
   return (
     <form method="get" action="/cars" aria-label="Filter cars" className={cn("rounded-[13px] border border-[#e7eae3] bg-card p-5", className)}>
@@ -78,6 +79,29 @@ export function CarFilters({ params, locations, idPrefix, className }: CarFilter
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor={id("brand")} className="text-xs">Brand</Label>
+            <select id={id("brand")} name="brand" defaultValue={params.brand ?? ""} className={selectClass}>
+              <option value="">Any</option>
+              {brands.map((brand) => (
+                <option key={brand} value={brand}>
+                  {brand}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor={id("rating")} className="text-xs">Rating</Label>
+            <select id={id("rating")} name="minRating" defaultValue={params.minRating?.toString() ?? ""} className={selectClass}>
+              <option value="">Any</option>
+              <option value="4.5">4.5+</option>
+              <option value="4.7">4.7+</option>
+              <option value="4.8">4.8+</option>
+            </select>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -144,6 +168,7 @@ export function CarFilters({ params, locations, idPrefix, className }: CarFilter
           <Label htmlFor={id("sort")} className="text-xs">Sort by</Label>
           <select id={id("sort")} name="sort" defaultValue={params.sort} className={selectClass}>
             <option value="recommended">Recommended</option>
+            <option value="popular">Most popular</option>
             <option value="price-asc">Lowest price</option>
             <option value="price-desc">Highest price</option>
             <option value="rating">Highest rated</option>

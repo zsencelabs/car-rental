@@ -7,18 +7,66 @@
  * The currency is a placeholder: the launch market and currency are still an
  * open question (docs/requirements/requirements-analysis.md, Q1).
  */
-import type { DriverProfile, Location, Money, Provider, Vehicle } from "./types";
+import type { DriverProfile, Location, Money, Provider, SampleReview, Vehicle, VehicleImage } from "./types";
 
 export const DISPLAY_CURRENCY = "USD";
 
 const money = (amount: string): Money => ({ amount, currency: DISPLAY_CURRENCY });
 
 export const locations: Location[] = [
-  { id: "loc-downtown", name: "Downtown", city: "Downtown" },
-  { id: "loc-airport", name: "Airport Terminal", city: "Airport" },
-  { id: "loc-harbour", name: "Harbour District", city: "Harbour" },
-  { id: "loc-north", name: "North Station", city: "North" },
+  {
+    id: "loc-downtown",
+    name: "Downtown",
+    city: "Downtown",
+    description: "Business trips, city errands and evenings out.",
+    image: "/images/destinations/downtown.jpg",
+  },
+  {
+    id: "loc-airport",
+    name: "Airport Terminal",
+    city: "Airport",
+    description: "Collect a car or meet your driver as you land.",
+    image: "/images/destinations/airport.jpg",
+  },
+  {
+    id: "loc-harbour",
+    name: "Harbour District",
+    city: "Harbour",
+    description: "Waterfront hotels, cruise arrivals and coastal drives.",
+    image: "/images/destinations/harbour.jpg",
+  },
+  {
+    id: "loc-north",
+    name: "North Station",
+    city: "North",
+    description: "Step off the train and straight into your car.",
+    image: "/images/destinations/station.jpg",
+  },
 ];
+
+const INTERIOR = {
+  leather: "/images/interiors/leather-seats.jpg",
+  tan: "/images/interiors/tan-leather.jpg",
+  dark: "/images/interiors/dark-cabin.jpg",
+} as const;
+
+/** Front and rear photos of the actual model, plus an interior (own or representative). */
+function gallery(id: string, name: string, interior: string, ownInterior = false): VehicleImage[] {
+  return [
+    { src: `/images/cars/${id}/front.jpg`, alt: `${name}, front three-quarter view`, kind: "exterior" },
+    { src: `/images/cars/${id}/rear.jpg`, alt: `${name}, rear three-quarter view`, kind: "exterior" },
+    {
+      src: interior,
+      alt: ownInterior ? `${name} interior` : "Representative car interior",
+      kind: "interior",
+      representative: !ownInterior,
+    },
+  ];
+}
+
+const STANDARD_DROPOFF = ["Same location", "Any KAIYA pickup point (fee may apply)"];
+const PROVIDER_INSURANCE =
+  "Third-party liability included by the provider. Optional damage cover will be offered at checkout (placeholder: insurance terms are still to be confirmed).";
 
 export const providers: Provider[] = [
   { id: "prv-greenline", name: "Greenline Rentals", type: "RENTAL_COMPANY", rating: 4.8, reviewCount: 312 },
@@ -59,6 +107,11 @@ export const vehicles: Vehicle[] = [
     featured: true,
     tint: "sand",
     summary: "A calm, roomy SUV for family trips and long highway days.",
+    images: gallery("volvo-xc60", "Volvo XC60", INTERIOR.leather),
+    minimumAge: 21,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-11-26", end: "2026-11-29" }, { start: "2026-12-12", end: "2026-12-18" }],
   },
   {
     id: "toyota-corolla",
@@ -87,6 +140,11 @@ export const vehicles: Vehicle[] = [
     featured: true,
     tint: "sage",
     summary: "Easy, efficient and reliable for everyday city driving.",
+    images: gallery("toyota-corolla", "Toyota Corolla", INTERIOR.tan),
+    minimumAge: 21,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-11-21", end: "2026-11-23" }, { start: "2026-12-05", end: "2026-12-07" }, { start: "2026-12-24", end: "2026-12-28" }],
   },
   {
     id: "audi-q5",
@@ -115,6 +173,11 @@ export const vehicles: Vehicle[] = [
     featured: true,
     tint: "mist",
     summary: "Premium comfort for business travel and special occasions.",
+    images: gallery("audi-q5", "Audi Q5", INTERIOR.dark),
+    minimumAge: 25,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-12-01", end: "2026-12-04" }, { start: "2026-12-20", end: "2027-01-02" }],
   },
   {
     id: "honda-fit",
@@ -143,6 +206,11 @@ export const vehicles: Vehicle[] = [
     featured: false,
     tint: "sage",
     summary: "A compact, easy-to-park hatchback from a local owner.",
+    images: gallery("honda-fit", "Honda Fit", INTERIOR.tan),
+    minimumAge: 21,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-11-28", end: "2026-11-30" }],
   },
   {
     id: "toyota-hiace",
@@ -171,6 +239,11 @@ export const vehicles: Vehicle[] = [
     featured: false,
     tint: "sand",
     summary: "Group travel and airport runs, best booked with a driver.",
+    images: gallery("toyota-hiace", "Toyota HiAce", "/images/cars/toyota-hiace/interior.jpg", true),
+    minimumAge: 23,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-12-08", end: "2026-12-10" }, { start: "2026-12-22", end: "2026-12-27" }],
   },
   {
     id: "hyundai-tucson",
@@ -199,6 +272,11 @@ export const vehicles: Vehicle[] = [
     featured: false,
     tint: "mist",
     summary: "A versatile SUV for weekends away, listed by its owner.",
+    images: gallery("hyundai-tucson", "Hyundai Tucson", INTERIOR.leather),
+    minimumAge: 21,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-12-14", end: "2026-12-16" }],
   },
   {
     id: "tesla-model-3",
@@ -227,6 +305,11 @@ export const vehicles: Vehicle[] = [
     featured: false,
     tint: "sage",
     summary: "Quiet, electric and quick, with home charging tips included.",
+    images: gallery("tesla-model-3", "Tesla Model 3", INTERIOR.dark),
+    minimumAge: 23,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-11-24", end: "2026-11-27" }, { start: "2026-12-30", end: "2027-01-03" }],
   },
   {
     id: "mercedes-e-class",
@@ -255,6 +338,15 @@ export const vehicles: Vehicle[] = [
     featured: false,
     tint: "mist",
     summary: "Executive comfort for events and airport transfers.",
+    images: [
+      { src: "/images/cars/mercedes-e-class/front.jpg", alt: "Mercedes-Benz E-Class, front three-quarter view", kind: "exterior" },
+      { src: "/images/cars/mercedes-e-class/interior.jpg", alt: "Mercedes-Benz E-Class cabin", kind: "interior" },
+      { src: "/images/cars/mercedes-e-class/dashboard.jpg", alt: "Mercedes-Benz E-Class dashboard", kind: "interior" },
+    ],
+    minimumAge: 25,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-12-02", end: "2026-12-03" }, { start: "2026-12-31", end: "2027-01-01" }],
   },
   {
     id: "suzuki-swift",
@@ -283,6 +375,11 @@ export const vehicles: Vehicle[] = [
     featured: false,
     tint: "sand",
     summary: "The budget-friendly choice for short city errands.",
+    images: gallery("suzuki-swift", "Suzuki Swift", INTERIOR.leather),
+    minimumAge: 21,
+    insurance: PROVIDER_INSURANCE,
+    dropoffOptions: STANDARD_DROPOFF,
+    bookedRanges: [{ start: "2026-12-19", end: "2026-12-21" }],
   },
 ];
 
@@ -302,6 +399,7 @@ export const drivers: DriverProfile[] = [
     cancellationRate: 1,
     dailyRate: money("70.00"),
     available: true,
+    performanceScore: 96,
     bio: "Calm, punctual and experienced with airport and long-distance trips.",
   },
   {
@@ -319,6 +417,7 @@ export const drivers: DriverProfile[] = [
     cancellationRate: 2,
     dailyRate: money("60.00"),
     available: true,
+    performanceScore: 92,
     bio: "Knows the city well and keeps every trip relaxed and on time.",
   },
   {
@@ -336,6 +435,7 @@ export const drivers: DriverProfile[] = [
     cancellationRate: 3,
     dailyRate: money("75.00"),
     available: true,
+    performanceScore: 89,
     bio: "Licensed for larger vehicles; ideal for group travel and vans.",
   },
   {
@@ -353,6 +453,7 @@ export const drivers: DriverProfile[] = [
     cancellationRate: 1,
     dailyRate: money("55.00"),
     available: true,
+    performanceScore: 95,
     bio: "Friendly and careful, with great reviews from families.",
   },
   {
@@ -370,6 +471,7 @@ export const drivers: DriverProfile[] = [
     cancellationRate: 4,
     dailyRate: money("50.00"),
     available: true,
+    performanceScore: 84,
     bio: "Reliable for city errands, events and evening pickups.",
   },
   {
@@ -387,6 +489,47 @@ export const drivers: DriverProfile[] = [
     cancellationRate: 2,
     dailyRate: money("65.00"),
     available: false,
+    performanceScore: 90,
     bio: "Executive and event driving with a focus on comfort.",
+  },
+];
+
+/** SAMPLE reviews for the preview. Not real customer feedback. */
+export const sampleReviews: SampleReview[] = [
+  {
+    id: "rev-1",
+    author: "Sample review · Nadia",
+    vehicleId: "volvo-xc60",
+    rating: 5,
+    title: "Smooth airport pickup",
+    body: "The car was ready at the terminal and the driver was waiting with a sign. Every charge matched the quote.",
+    mode: "WITH_DRIVER",
+  },
+  {
+    id: "rev-2",
+    author: "Sample review · James",
+    vehicleId: "toyota-corolla",
+    rating: 5,
+    title: "Easy self-drive weekend",
+    body: "Quick license check, clean car, and the deposit was shown separately from the price, so no surprises.",
+    mode: "SELF_DRIVE",
+  },
+  {
+    id: "rev-3",
+    author: "Sample review · Aisha",
+    vehicleId: "toyota-hiace",
+    rating: 4,
+    title: "Great for our family trip",
+    body: "We chose our own driver from the list. Being able to compare ratings and languages made it easy.",
+    mode: "WITH_DRIVER",
+  },
+  {
+    id: "rev-4",
+    author: "Sample review · Marco",
+    vehicleId: "audi-q5",
+    rating: 5,
+    title: "Premium and on time",
+    body: "Handover took five minutes, and the condition report with photos made the return quick.",
+    mode: "SELF_DRIVE",
   },
 ];

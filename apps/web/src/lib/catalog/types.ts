@@ -40,6 +40,34 @@ export interface Location {
   id: string;
   name: string;
   city: string;
+  /** Short line for destination cards. */
+  description: string;
+  image: string;
+}
+
+export interface VehicleImage {
+  src: string;
+  alt: string;
+  kind: "exterior" | "interior";
+  /** True when the photo shows a similar car rather than this exact model (e.g. a generic interior). */
+  representative?: boolean;
+}
+
+/** Inclusive calendar-date range, "YYYY-MM-DD". Sample data only. */
+export interface DateRange {
+  start: string;
+  end: string;
+}
+
+export interface SampleReview {
+  id: string;
+  author: string;
+  /** Vehicle the review refers to; undefined for platform reviews. */
+  vehicleId?: string;
+  rating: number;
+  title: string;
+  body: string;
+  mode: RentalMode;
 }
 
 export type VehicleTint = "sand" | "sage" | "mist";
@@ -73,6 +101,12 @@ export interface Vehicle {
   featured: boolean;
   tint: VehicleTint;
   summary: string;
+  images: VehicleImage[];
+  minimumAge: number;
+  insurance: string;
+  dropoffOptions: string[];
+  /** Sample booked dates for the indicative availability calendar. */
+  bookedRanges: DateRange[];
 }
 
 /** Public driver profile. Never includes license numbers or documents (SRS §5.2, §18.6). */
@@ -91,10 +125,12 @@ export interface DriverProfile {
   cancellationRate: number;
   dailyRate: Money;
   available: boolean;
+  /** 0–100, from configurable rules, not ratings alone (SRS §5.5). Sample value. */
+  performanceScore: number;
   bio: string;
 }
 
-export type SortOption = "recommended" | "price-asc" | "price-desc" | "rating";
+export type SortOption = "recommended" | "popular" | "price-asc" | "price-desc" | "rating";
 
 export const CATEGORY_LABELS: Record<VehicleCategory, string> = {
   sedan: "Sedan",

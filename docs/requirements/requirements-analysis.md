@@ -323,6 +323,15 @@ All items below are recommendations. I changed nothing except where noted.
 
 ---
 
+## 11a. UI coverage update (2026-11-18)
+The public preview site (`apps/web`, sample data, UI only) now represents these SRS items:
+- **§4.1:** login/registration entry points, search, categories, featured/recommended cars, popular destinations, how it works, promotional banner, sample reviews, contact info, and a footer with policies.
+- **§4.2–4.3:** search by location, dates and rental type, plus filters for brand, category, transmission, fuel, seats, price and rating, and sorting by recommended, most popular, price and rating.
+- **§4.4:** gallery (exterior and interior), rates, deposit, mileage, fuel, cancellation, insurance, requirements, drop-off options, indicative availability calendar, provider info and reviews.
+- **§5.2:** public driver profile fields, with the license category only.
+
+Still not built: authentication, booking, payments, provider/driver/admin portals, and every backend rule. Those wait on the P0/P1 questions below.
+
 ## 12. Prioritized questions for the product owner
 
 **P0 blocks architecture. P1 blocks database design. P2 can be decided during build.**

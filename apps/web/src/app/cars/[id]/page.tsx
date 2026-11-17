@@ -2,11 +2,22 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, BuildingIcon, CheckIcon, MapPinIcon, StarIcon, UserIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  BuildingIcon,
+  CheckIcon,
+  IdCardIcon,
+  MapPinIcon,
+  RouteIcon,
+  ShieldCheckIcon,
+  StarIcon,
+  UserIcon,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CarIllustration } from "@/components/site/car-illustration";
+import { AvailabilityCalendar } from "@/components/site/availability-calendar";
+import { VehicleGallery } from "@/components/site/vehicle-gallery";
 import { DriverCard } from "@/components/site/driver-card";
 import { PageContainer } from "@/components/site/page-intro";
 import { RentalOptions, RentalOptionsTabs } from "@/components/site/rental-options";
@@ -16,6 +27,7 @@ import {
   getProvider,
   getRecommendedDrivers,
   getVehicle,
+  listSampleReviews,
   listVehicleIds,
 } from "@/lib/catalog/queries";
 import { CATEGORY_LABELS, type DriverProfile, type Vehicle } from "@/lib/catalog/types";
@@ -66,7 +78,7 @@ function SelfDrivePanel({ vehicle }: { vehicle: Vehicle }) {
           "A valid driving license",
           "Identity verification before your booking is confirmed",
           `A refundable security deposit of ${formatMoney(vehicle.securityDeposit, { compact: true })}`,
-          "To meet the minimum age set for this vehicle",
+          `Minimum driver age: ${vehicle.minimumAge}`,
         ].map((item) => (
           <li key={item} className="flex gap-2">
             <CheckIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -108,10 +120,11 @@ export default async function CarDetailPage({ params }: PageProps<"/cars/[id]">)
   const vehicle = await getVehicle(id);
   if (!vehicle) notFound();
 
-  const [provider, location, drivers] = await Promise.all([
+  const [provider, location, drivers, reviews] = await Promise.all([
     getProvider(vehicle.providerId),
     getLocation(vehicle.locationId),
     getRecommendedDrivers(vehicle),
+    listSampleReviews(vehicle.id),
   ]);
 
   const tabsProps = {
@@ -132,12 +145,7 @@ export default async function CarDetailPage({ params }: PageProps<"/cars/[id]">)
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[1.25fr_1fr]">
         <div>
-          <CarIllustration
-            category={vehicle.category}
-            tint={vehicle.tint}
-            label={`Illustration of a ${CATEGORY_LABELS[vehicle.category]}`}
-            className="h-64 rounded-[18px] md:h-80"
-          />
+          <VehicleGallery images={vehicle.images} name={vehicle.name} />
 
           <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -204,6 +212,29 @@ export default async function CarDetailPage({ params }: PageProps<"/cars/[id]">)
             </div>
           </dl>
 
+          <h2 className="mt-8 text-lg font-semibold text-brand-ink">Rental requirements</h2>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+            {[
+              { Icon: IdCardIcon, title: "Self-drive", body: `Valid license, ID verification, age ${vehicle.minimumAge}+.` },
+              { Icon: UserIcon, title: "With a driver", body: "Choose a verified independent driver. No license needed." },
+              { Icon: ShieldCheckIcon, title: "Insurance", body: vehicle.insurance },
+              { Icon: RouteIcon, title: "Pickup & drop-off", body: `${location?.name ?? "Provider location"}. Drop-off: ${vehicle.dropoffOptions.join(" or ")}.` },
+            ].map(({ Icon, title, body }) => (
+              <li key={title} className="flex gap-3 rounded-xl border border-border bg-card p-4">
+                <Icon aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-semibold text-brand-ink">{title}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{body}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="mt-8 text-lg font-semibold text-brand-ink">Availability</h2>
+          <div className="mt-3 rounded-2xl border border-border bg-card p-5">
+            <AvailabilityCalendar ranges={vehicle.bookedRanges} />
+          </div>
+
           {provider ? (
             <div className="mt-8 flex items-center gap-4 rounded-[13px] border border-[#e7eae3] bg-card p-4">
               <span className="grid size-11 place-items-center rounded-xl bg-secondary text-secondary-foreground">
@@ -221,6 +252,26 @@ export default async function CarDetailPage({ params }: PageProps<"/cars/[id]">)
                 </p>
               </div>
             </div>
+          ) : null}
+
+          {reviews.length > 0 ? (
+            <section aria-labelledby="car-reviews" className="mt-8">
+              <h2 id="car-reviews" className="text-lg font-semibold text-brand-ink">
+                Reviews <span className="text-sm font-normal text-muted-foreground">(sample)</span>
+              </h2>
+              <ul className="mt-3 space-y-3">
+                {reviews.map((review) => (
+                  <li key={review.id} className="rounded-xl border border-border bg-card p-4">
+                    <p className="flex items-center gap-1 text-sm font-semibold text-brand-ink">
+                      <StarIcon aria-hidden="true" className="size-3.5 fill-[#c9a45c] text-[#c9a45c]" />
+                      {review.rating}/5 · {review.title}
+                    </p>
+                    <p className="mt-1.5 text-sm text-muted-foreground">{review.body}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">{review.author}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ) : null}
         </div>
 

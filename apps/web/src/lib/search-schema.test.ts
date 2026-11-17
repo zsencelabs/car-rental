@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createSearchFormSchema, parseSearchParams } from "./search-schema";
+import { createSearchFormSchema, formatRentalLength, parseSearchParams } from "./search-schema";
 
 const NOW = new Date("2026-12-01T09:00");
 const schema = createSearchFormSchema(() => NOW);
@@ -7,9 +7,12 @@ const schema = createSearchFormSchema(() => NOW);
 const valid = {
   mode: "SELF_DRIVE",
   pickupLocation: "loc-downtown",
-  dropoffLocation: "loc-airport",
-  pickupAt: "2026-12-02T10:00",
-  returnAt: "2026-12-05T10:00",
+  sameReturn: true,
+  returnLocation: "",
+  pickupDate: "2026-12-02",
+  pickupTime: "10:00",
+  returnDate: "2026-12-05",
+  returnTime: "10:00",
 };
 
 function issuePaths(input: unknown): string[] {
@@ -17,8 +20,8 @@ function issuePaths(input: unknown): string[] {
   return result.success ? [] : result.error.issues.map((issue) => issue.path.join("."));
 }
 
-describe("search form schema", () => {
-  it("accepts a valid future search", () => {
+describe("rental search form schema", () => {
+  it("accepts a valid future rental returning to the same location", () => {
     expect(schema.safeParse(valid).success).toBe(true);
   });
 
@@ -30,21 +33,41 @@ describe("search form schema", () => {
     expect(issuePaths({ ...valid, mode: "CHAUFFEUR" })).toContain("mode");
   });
 
-  it("rejects a pickup in the past", () => {
-    expect(issuePaths({ ...valid, pickupAt: "2026-11-30T10:00" })).toContain("pickupAt");
+  it("requires a return location only when returning elsewhere", () => {
+    expect(issuePaths({ ...valid, sameReturn: false })).toContain("returnLocation");
+    expect(schema.safeParse({ ...valid, sameReturn: false, returnLocation: "loc-airport" }).success).toBe(true);
   });
 
-  it("rejects a return before pickup", () => {
-    expect(issuePaths({ ...valid, returnAt: "2026-12-02T09:00" })).toContain("returnAt");
+  it("rejects a pick-up in the past", () => {
+    expect(issuePaths({ ...valid, pickupDate: "2026-11-30" })).toContain("pickupDate");
   });
 
-  it("rejects a return equal to pickup", () => {
-    expect(issuePaths({ ...valid, returnAt: valid.pickupAt })).toContain("returnAt");
+  it("rejects a return before or equal to pick-up, using the times", () => {
+    expect(issuePaths({ ...valid, returnDate: "2026-12-02", returnTime: "09:30" })).toContain("returnDate");
+    expect(issuePaths({ ...valid, returnDate: "2026-12-02", returnTime: "10:00" })).toContain("returnDate");
+    expect(schema.safeParse({ ...valid, returnDate: "2026-12-02", returnTime: "18:00" }).success).toBe(true);
   });
 
-  it("requires locations and dates", () => {
-    const paths = issuePaths({ mode: "SELF_DRIVE", pickupLocation: "", dropoffLocation: "", pickupAt: "", returnAt: "" });
-    expect(paths).toEqual(expect.arrayContaining(["pickupLocation", "dropoffLocation", "pickupAt", "returnAt"]));
+  it("requires a location and dates", () => {
+    const paths = issuePaths({ ...valid, pickupLocation: "", pickupDate: "", returnDate: "" });
+    expect(paths).toEqual(expect.arrayContaining(["pickupLocation", "pickupDate", "returnDate"]));
+  });
+});
+
+describe("formatRentalLength", () => {
+  it("formats whole days", () => {
+    expect(formatRentalLength("2026-12-02T10:00", "2026-12-05T10:00")).toBe("3 days");
+    expect(formatRentalLength("2026-12-02T10:00", "2026-12-03T10:00")).toBe("1 day");
+  });
+
+  it("formats days with hours and short rentals", () => {
+    expect(formatRentalLength("2026-12-02T10:00", "2026-12-03T14:00")).toBe("1 day 4 hours");
+    expect(formatRentalLength("2026-12-02T10:00", "2026-12-02T16:30")).toBe("6 hours 30 min");
+  });
+
+  it("returns undefined for invalid or reversed ranges", () => {
+    expect(formatRentalLength("2026-12-05T10:00", "2026-12-02T10:00")).toBeUndefined();
+    expect(formatRentalLength("", "2026-12-02T10:00")).toBeUndefined();
   });
 });
 
@@ -73,6 +96,12 @@ describe("parseSearchParams", () => {
 
   it("uses the first value when a param is repeated", () => {
     expect(parseSearchParams({ mode: ["WITH_DRIVER", "SELF_DRIVE"] }).mode).toBe("WITH_DRIVER");
+  });
+
+  it("accepts brand, rating and the popular sort; drops an out-of-range rating", () => {
+    const params = parseSearchParams({ brand: "Volvo", minRating: "4.5", sort: "popular" });
+    expect(params).toMatchObject({ brand: "Volvo", minRating: 4.5, sort: "popular" });
+    expect(parseSearchParams({ minRating: "9" }).minRating).toBeUndefined();
   });
 
   it("coerces numeric filters", () => {

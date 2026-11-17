@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CarCard } from "@/components/site/car-card";
 import { CarFilters } from "@/components/site/car-filters";
 import { PageContainer, PreviewNotice } from "@/components/site/page-intro";
-import { getLocation, listLocations, searchVehicles } from "@/lib/catalog/queries";
+import { getLocation, listBrands, listLocations, searchVehicles } from "@/lib/catalog/queries";
 import { modeLabel, parseSearchParams } from "@/lib/search-schema";
 
 export const metadata: Metadata = {
@@ -20,8 +20,9 @@ function formatWhen(value: string): string {
 
 async function CarResults({ searchParams }: { searchParams: PageProps<"/cars">["searchParams"] }) {
   const params = parseSearchParams(await searchParams);
-  const [locations, results, location] = await Promise.all([
+  const [locations, brands, results, location] = await Promise.all([
     listLocations(),
+    listBrands(),
     searchVehicles(params),
     params.location ? getLocation(params.location) : Promise.resolve(undefined),
   ]);
@@ -34,9 +35,9 @@ async function CarResults({ searchParams }: { searchParams: PageProps<"/cars">["
             Filters &amp; sort
             <ChevronDownIcon aria-hidden="true" className="size-4 transition-transform group-open:rotate-180" />
           </summary>
-          <CarFilters params={params} locations={locations} idPrefix="m" className="rounded-t-none border-0 border-t" />
+          <CarFilters params={params} locations={locations} brands={brands} idPrefix="m" className="rounded-t-none border-0 border-t" />
         </details>
-        <CarFilters params={params} locations={locations} idPrefix="d" className="hidden lg:block" />
+        <CarFilters params={params} locations={locations} brands={brands} idPrefix="d" className="hidden lg:block" />
       </aside>
 
       <section aria-labelledby="results-heading">
@@ -52,8 +53,8 @@ async function CarResults({ searchParams }: { searchParams: PageProps<"/cars">["
 
         {results.length > 0 ? (
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {results.map((vehicle) => (
-              <CarCard key={vehicle.id} vehicle={vehicle} mode={params.mode} />
+            {results.map((vehicle, index) => (
+              <CarCard key={vehicle.id} vehicle={vehicle} mode={params.mode} priority={index < 3} />
             ))}
           </div>
         ) : (

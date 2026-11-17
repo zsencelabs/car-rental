@@ -11,8 +11,8 @@
  */
 import type { SearchParams } from "@/lib/search-schema";
 import { compareMoney, toMinorUnits } from "./money";
-import { drivers, locations, providers, vehicles } from "./mock-data";
-import type { DriverProfile, Location, Provider, Vehicle } from "./types";
+import { drivers, locations, providers, sampleReviews, vehicles } from "./mock-data";
+import type { DriverProfile, Location, Provider, SampleReview, Vehicle } from "./types";
 
 export async function listLocations(): Promise<Location[]> {
   return locations;
@@ -48,6 +48,8 @@ export function filterAndSortVehicles(all: Vehicle[], params: VehicleFilters): V
     if (params.transmission && vehicle.transmission !== params.transmission) return false;
     if (params.fuel && vehicle.fuel !== params.fuel) return false;
     if (params.minSeats && vehicle.seats < params.minSeats) return false;
+    if (params.brand && vehicle.brand !== params.brand) return false;
+    if (params.minRating && vehicle.rating < params.minRating) return false;
     if (
       params.maxDailyRate &&
       toMinorUnits(vehicle.dailyRate.amount) > BigInt(params.maxDailyRate) * 100n
@@ -64,6 +66,9 @@ export function filterAndSortVehicles(all: Vehicle[], params: VehicleFilters): V
       break;
     case "price-desc":
       sorted.sort((a, b) => compareMoney(b.dailyRate, a.dailyRate));
+      break;
+    case "popular":
+      sorted.sort((a, b) => b.reviewCount - a.reviewCount);
       break;
     case "rating":
       sorted.sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
@@ -104,4 +109,44 @@ export async function getRecommendedDrivers(vehicle: Vehicle): Promise<DriverPro
   const location = await getLocation(vehicle.locationId);
   if (!location) return [];
   return rankDriversForCity(drivers, location.city);
+}
+
+export async function listBrands(): Promise<string[]> {
+  return [...new Set(vehicles.map((vehicle) => vehicle.brand))].sort();
+}
+
+/** All listings; used to pick a representative photo for each category tile. */
+export async function listAllVehicles(): Promise<Vehicle[]> {
+  return vehicles;
+}
+
+export async function listSampleReviews(vehicleId?: string): Promise<SampleReview[]> {
+  return vehicleId ? sampleReviews.filter((review) => review.vehicleId === vehicleId) : sampleReviews;
+}
+
+/** Top available drivers for the home page showcase (display-only ranking). */
+export async function listFeaturedDrivers(limit = 4): Promise<DriverProfile[]> {
+  return drivers
+    .filter((driver) => driver.available)
+    .sort((a, b) => b.performanceScore - a.performanceScore)
+    .slice(0, limit);
+}
+
+export interface WeeklySaving {
+  vehicle: Vehicle;
+  /** Whole-percent saving of the weekly rate versus 7 × the daily rate (rounded down). */
+  percent: number;
+}
+
+/** Largest weekly-vs-daily saving across listings, computed in integer minor units. */
+export async function getBestWeeklySaving(): Promise<WeeklySaving | undefined> {
+  let best: WeeklySaving | undefined;
+  for (const vehicle of vehicles) {
+    const sevenDays = toMinorUnits(vehicle.dailyRate.amount) * 7n;
+    const weekly = toMinorUnits(vehicle.weeklyRate.amount);
+    if (weekly >= sevenDays) continue;
+    const percent = Number(((sevenDays - weekly) * 100n) / sevenDays);
+    if (!best || percent > best.percent) best = { vehicle, percent };
+  }
+  return best;
 }

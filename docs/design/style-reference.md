@@ -60,6 +60,24 @@ The client site is **light-only** (`color-scheme: light`). Whether our product n
 - Check contrast before use. `--muted-foreground` on `--background` and `#748078` on cream are mid-gray-green, so verify they reach WCAG AA (4.5:1) for body text at 14px.
 - Keep the green focus ring (`--ring`) visible on all interactive elements.
 
+## Photography (added 2026-11-18)
+- **Cars:** real photos of each exact model, from Wikimedia Commons (CC BY / CC BY-SA, credited on `/credits`). Front three-quarter shot as the cover, then rear and interior. When a model's own interior isn't available, a generic interior is used and labelled "representative photo".
+- **Lifestyle and destinations:** rawpixel CC0 photos. Dusk and golden-hour tones fit the green-and-cream palette.
+- **People:** no identifiable faces on sample driver or reviewer profiles. Initials avatars are used instead, because stock licenses don't cover presenting a real person as a fictional driver. Lifestyle shots show drivers from behind.
+- Images live in `apps/web/public/images/`, sized to a maximum of 1600px and served through `next/image`.
+- Dark-green gradient overlays (`rgba(15–22, 30–44, 22–33, …)`) keep text on photos at AA contrast.
+
+## Navigation
+- On the home page the header sits transparent over the hero photo (white text) and turns solid cream with a blur and a shadow after 24px of scroll. Every other page has a solid header.
+- Desktop menus: Rent a car (modes plus category thumbnails), How it works, Work with us, Help, then Log in and a Register menu (Customer / Vehicle provider / Driver).
+- Mobile menu: a full-height sheet with grouped accordions, and Log in / Register pinned at the bottom.
+
+## Motion
+- Library: `motion` (`motion/react`). `MotionConfig reducedMotion="user"` wraps the app, so the OS "reduce motion" setting is honored.
+- Easing `cubic-bezier(0.22, 1, 0.36, 1)`. Durations 0.4–0.8s. Animate only opacity and transforms.
+- Sections fade and rise in once when they enter view (`Reveal`).
+- **Scroll story** ("How KAIYA works"): five scenes (search, compare, choose your way, confirmed together, pick up and go) in a sticky panel that cross-fades as the steps scroll past. On mobile each scene sits under its step and plays when it comes into view.
+
 ## Open questions
 - ~~Is "KAIYA Rentals" the product name?~~ Confirmed 2026-11-18. The logo mark is still a placeholder "K" tile.
 - Should the admin and provider dashboards use the same palette, or a more neutral variant?

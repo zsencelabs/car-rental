@@ -22,6 +22,11 @@ Option 1:
 - Money is a decimal string + currency, with BigInt minor-unit comparisons. There is no floating-point money anywhere.
 - Tests: Vitest (unit) and Playwright (E2E, desktop and mobile Chrome).
 
+## Update 2026-11-18: photos and motion
+- **`motion` added** for UI animation (reveals, the scroll story, the nav, the gallery). Reduced motion is honored globally.
+- **Images:** Unsplash blocks unauthenticated downloads, so photos were sourced through Openverse instead. Car models come from Wikimedia Commons (CC BY / CC BY-SA 4.0, attribution on `/credits`, resized only). Lifestyle and destination photos come from rawpixel (CC0). 32 images, about 5.4 MB, committed to `public/images`. CC BY-SA images must keep their credit, and any edited versions must be shared under the same license.
+- No identifiable faces are used for fictional driver or reviewer profiles.
+
 ## Consequences
 - Positive: follows `CLAUDE.md`, the UI can be reviewed with the client before backend decisions, and the backend can be added as `apps/api` without restructuring.
 - Negative: mock data can drift from the eventual API contract. Mitigated by keeping types in `src/lib/catalog/types.ts` and moving them into a shared package when the API exists.

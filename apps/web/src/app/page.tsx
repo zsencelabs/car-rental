@@ -1,110 +1,142 @@
-import Link from "next/link";
-import { ArrowRightIcon, ShieldCheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CarCard } from "@/components/site/car-card";
-import { HeroArt } from "@/components/site/hero-art";
-import { HowItWorksSteps } from "@/components/site/how-it-works-steps";
-import { PartnerCards } from "@/components/site/partner-cards";
-import { SearchForm } from "@/components/site/search-form";
-import { listFeaturedVehicles, listLocations } from "@/lib/catalog/queries";
+import { HomeHero } from "@/components/site/home-hero";
+import {
+  CategoryGrid,
+  Destinations,
+  DriverShowcase,
+  PartnerCta,
+  PromoBanner,
+  ReviewsGrid,
+  SectionHeading,
+  TwoWaysToRent,
+  ValueStrip,
+} from "@/components/site/home-sections";
+import { HowItWorksStory } from "@/components/site/how-it-works-story";
+import { Reveal } from "@/components/motion/reveal";
+import {
+  getBestWeeklySaving,
+  listFeaturedDrivers,
+  listFeaturedVehicles,
+  listLocations,
+  listSampleReviews,
+} from "@/lib/catalog/queries";
+
+function Section({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <section className={`mx-auto w-full max-w-[1240px] px-4 sm:px-6 ${className}`}>{children}</section>;
+}
 
 export default async function HomePage() {
-  const [locations, featured] = await Promise.all([listLocations(), listFeaturedVehicles()]);
+  const [locations, featured, drivers, reviews, saving] = await Promise.all([
+    listLocations(),
+    listFeaturedVehicles(),
+    listFeaturedDrivers(4),
+    listSampleReviews(),
+    getBestWeeklySaving(),
+  ]);
 
   return (
     <>
-      <section className="mx-auto w-full max-w-[1180px] px-4 pt-12 pb-16 sm:px-6 md:pt-16">
-        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-14">
-          <div className="max-w-[540px]">
-            <p className="eyebrow flex items-center gap-2.5">
-              <span aria-hidden="true" className="size-[7px] rounded-full bg-[#82a687] shadow-[0_0_0_4px_#e9efe7]" />
-              Your next journey starts here
-            </p>
-            <h1 className="display-title mt-5">
-              Find your way.
-              <br />
-              <em className="heading-accent">We&apos;ll find the car.</em>
-            </h1>
-            <p className="mt-5 max-w-[475px] text-[0.95rem] leading-[1.8] text-[#5f6e64]">
-              Thoughtful car hire, on your terms. Choose a car that fits your plans, and go your own way, or
-              let a professional driver take the wheel.
-            </p>
-            <p className="mt-6 flex items-center gap-2.5 text-sm text-[#5b6a60]">
-              <span className="grid size-8 place-items-center rounded-full bg-secondary">
-                <ShieldCheckIcon aria-hidden="true" className="size-4 text-primary" />
-              </span>
-              Trusted vehicles. Clear pricing. Support when you need it.
-            </p>
-          </div>
+      <HomeHero locations={locations} />
 
-          <HeroArt />
-        </div>
+      <Section className="pt-16 pb-6">
+        <ValueStrip />
+      </Section>
 
-        <div className="mt-12">
-          <SearchForm locations={locations} />
+      <Section className="py-20">
+        <SectionHeading
+          eyebrow="Browse by category"
+          title="The right car"
+          accent="for the trip."
+          action={{ href: "/cars", label: "All cars" }}
+        />
+        <div className="mt-10">
+          <CategoryGrid />
         </div>
-      </section>
+      </Section>
 
-      <section aria-labelledby="featured-heading" className="mx-auto w-full max-w-[1180px] px-4 pb-20 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow">Featured</p>
-            <h2 id="featured-heading" className="section-title mt-2">
-              A car for every kind of day
-            </h2>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/cars">
-              Browse all cars <ArrowRightIcon aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((vehicle) => (
-            <CarCard key={vehicle.id} vehicle={vehicle} />
+      <Section className="pb-24">
+        <SectionHeading
+          eyebrow="Recommended"
+          title="Popular right now"
+          description="Hand-picked cars from rental companies and local owners, all verified before listing."
+          action={{ href: "/cars?sort=popular", label: "See more" }}
+        />
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((vehicle, index) => (
+            <Reveal key={vehicle.id} delay={index * 0.08}>
+              <CarCard vehicle={vehicle} className="h-full" />
+            </Reveal>
           ))}
         </div>
-      </section>
+      </Section>
 
-      <section className="bg-primary text-primary-foreground">
-        <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start justify-between gap-6 px-4 py-14 sm:px-6 md:flex-row md:items-center">
-          <div>
-            <h2 className="text-3xl font-semibold tracking-[-0.035em] md:text-4xl">
-              Pick your car. <em className="font-[family-name:var(--font-accent)] font-normal text-[#cfe0d2]">Pick your pace.</em>
+      <section aria-labelledby="story-heading" className="border-y border-border bg-[#f3f1e8]">
+        <div className="mx-auto w-full max-w-[1240px] px-4 pt-24 sm:px-6">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="eyebrow">How KAIYA works</p>
+            <h2 id="story-heading" className="section-title mt-3">
+              One booking, <em className="heading-accent">two independent services.</em>
             </h2>
-            <p className="mt-3 max-w-xl text-primary-foreground/80">
-              Drive yourself, or add an independent driver you choose from rated, verified professionals.
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+              Cars come from rental companies and local owners. Drivers are independent professionals. We
+              bring them together, check both, and confirm only when everything lines up.
             </p>
-          </div>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/how-it-works">Explore your options</Link>
-          </Button>
-        </div>
-      </section>
-
-      <section aria-labelledby="how-heading" className="mx-auto w-full max-w-[1180px] px-4 py-20 sm:px-6">
-        <p className="eyebrow">How it works</p>
-        <h2 id="how-heading" className="section-title mt-2">
-          Three steps to the road
-        </h2>
-        <HowItWorksSteps className="mt-8" />
-      </section>
-
-      <section aria-labelledby="partners-heading" className="border-t border-border bg-muted/60">
-        <div className="mx-auto w-full max-w-[1180px] px-4 py-20 sm:px-6">
-          <p className="eyebrow">Work with us</p>
-          <h2 id="partners-heading" className="section-title mt-2">
-            Rental partners
-          </h2>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Vehicle ownership and driving services stay independent. Providers bring the cars, and drivers
-            bring their skills.
-          </p>
-          <div className="mt-8">
-            <PartnerCards />
+          </Reveal>
+          <div className="mt-6 pb-16">
+            <HowItWorksStory />
           </div>
         </div>
       </section>
+
+      <Section className="py-24">
+        <SectionHeading eyebrow="Two ways to rent" title="Drive yourself," accent="or be driven." />
+        <div className="mt-10">
+          <TwoWaysToRent />
+        </div>
+      </Section>
+
+      <Section className="pb-24">
+        <SectionHeading
+          eyebrow="Independent drivers"
+          title="Meet some of our drivers"
+          description="Sample profiles. Every driver is verified and ranked by performance, not just ratings. You always choose."
+          action={{ href: "/work-with-us/drivers", label: "Become a driver" }}
+        />
+        <div className="mt-10">
+          <DriverShowcase drivers={drivers} />
+        </div>
+      </Section>
+
+      <Section className="pb-24">
+        <SectionHeading
+          eyebrow="Popular destinations"
+          title="Pick up where"
+          accent="you land."
+          description="Collect your car, or meet your driver, at the places you arrive."
+        />
+        <div className="mt-10">
+          <Destinations locations={locations} />
+        </div>
+      </Section>
+
+      <Section className="pb-24">
+        <PromoBanner saving={saving} />
+      </Section>
+
+      <Section className="pb-24">
+        <SectionHeading
+          eyebrow="Customer reviews"
+          title="What renters say"
+          description="Sample reviews for this preview. Reviews will only come from completed bookings."
+        />
+        <div className="mt-10">
+          <ReviewsGrid reviews={reviews} />
+        </div>
+      </Section>
+
+      <Section className="pb-24">
+        <PartnerCta />
+      </Section>
     </>
   );
 }
