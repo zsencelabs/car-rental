@@ -30,7 +30,7 @@ async function pickDates(page: Page, startOffset: number, endOffset: number) {
 test("home page shows hero, search and recommended cars with real photos", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Find your way.");
-  await expect(page.getByRole("heading", { name: "Rent a car for your dates" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Where are you headed?" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Popular right now" })).toBeVisible();
   await expect(page.getByRole("img", { name: /Volvo XC60, front/ }).first()).toBeAttached();
   await expectNoBrokenImages(page);
@@ -77,6 +77,7 @@ test("with-driver search leads to results and driver recommendations", async ({ 
   await page.getByRole("radiogroup", { name: "Rental type" }).getByText("With a driver").click();
   await page.getByRole("combobox", { name: "Pick-up location" }).click();
   await page.getByRole("option", { name: "Airport Terminal" }).click();
+  await expect(page.locator("#pickupLocation svg.lucide-map-pin")).toHaveCount(1);
   await pickDates(page, 3, 6);
   await expect(page.locator("[data-rental-length]")).toHaveText("Rental length: 3 days");
   await page.getByRole("button", { name: "Find cars" }).click();
@@ -173,7 +174,7 @@ test("reduced motion still shows all content", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Rent a car for your dates" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Where are you headed?" })).toBeVisible();
   await page.locator('[data-story-step="3"]').scrollIntoViewIfNeeded();
   await expect(page.getByRole("heading", { name: "Choose your way" })).toBeVisible();
   await context.close();
@@ -252,6 +253,8 @@ test("date picker is custom, blocks past days, and offers quick durations", asyn
   await page.getByRole("option", { name: "18:00" }).click();
   await expect(page.getByText("Rental length: 7 days 8 hours").first()).toBeVisible();
 
+  // Let the time list finish closing so Escape goes to the picker, not the list.
+  await expect(page.getByRole("listbox")).toHaveCount(0);
   await page.keyboard.press("Escape");
   await expect(page.getByText("Select your rental dates")).toHaveCount(0);
   await expect(page.locator("#returnDate")).toContainText("18:00");

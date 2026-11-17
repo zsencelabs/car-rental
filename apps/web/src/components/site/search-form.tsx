@@ -35,8 +35,8 @@ import { cn } from "@/lib/utils";
 import { RentalDatesPicker } from "./rental-dates-picker";
 
 const MODE_OPTIONS = [
-  { value: "SELF_DRIVE", label: "Self-drive", hint: "You drive", Icon: KeyRoundIcon },
-  { value: "WITH_DRIVER", label: "With a driver", hint: "We match a pro", Icon: UsersRoundIcon },
+  { value: "SELF_DRIVE", label: "Self-drive", Icon: KeyRoundIcon },
+  { value: "WITH_DRIVER", label: "With a driver", Icon: UsersRoundIcon },
 ] as const;
 
 const TRUST_POINTS = ["No hidden fees", "Deposit shown separately"] as const;
@@ -79,8 +79,7 @@ function LocationSelect({
       </SelectTrigger>
       <SelectContent position="popper" className="p-1.5">
         {locations.map((location) => (
-          <SelectItem key={location.id} value={location.id} className="gap-2.5 py-2.5 pr-8 pl-2.5">
-            <MapPinIcon aria-hidden="true" className="size-4 text-muted-foreground" />
+          <SelectItem key={location.id} value={location.id} className="py-2.5 pr-8 pl-3">
             {location.name}
           </SelectItem>
         ))}
@@ -142,7 +141,7 @@ export function SearchForm({ locations }: { locations: Location[] }) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="md:shrink-0">
           <h2 id="search-heading" className="text-xl font-semibold tracking-tight text-brand-ink">
-            Rent a car for your dates
+            Where are you headed?
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Daily, weekly and monthly rates · self-drive or with a driver
@@ -157,33 +156,27 @@ export function SearchForm({ locations }: { locations: Location[] }) {
               value={field.value}
               onValueChange={field.onChange}
               aria-label="Rental type"
-              className="grid w-full grid-cols-2 gap-1 rounded-xl border border-border bg-muted p-1 md:w-auto"
+              className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto"
             >
-              {MODE_OPTIONS.map(({ value, label, hint, Icon }) => (
-                <Label
-                  key={value}
-                  htmlFor={`mode-${value}`}
-                  className={cn(
-                    "relative flex cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2 whitespace-nowrap transition-colors sm:px-4 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
-                    field.value === value ? "text-brand-ink" : "text-muted-foreground hover:text-brand-ink",
-                  )}
-                >
-                  {field.value === value ? (
-                    <motion.span
-                      layoutId="search-mode-indicator"
-                      aria-hidden="true"
-                      className="absolute inset-0 rounded-lg bg-card shadow-sm"
-                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                    />
-                  ) : null}
-                  <RadioGroupItem id={`mode-${value}`} value={value} className="sr-only" />
-                  <Icon aria-hidden="true" className="relative size-4 shrink-0" />
-                  <span className="relative flex flex-col items-start leading-tight">
-                    <span className="text-sm font-semibold">{label}</span>
-                    <span className="hidden text-[0.7rem] font-normal text-muted-foreground sm:block">{hint}</span>
-                  </span>
-                </Label>
-              ))}
+              {MODE_OPTIONS.map(({ value, label, Icon }) => {
+                const selected = field.value === value;
+                return (
+                  <Label
+                    key={value}
+                    htmlFor={`mode-${value}`}
+                    className={cn(
+                      "flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+                      selected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-white text-[#3f5146] hover:border-primary/50 hover:text-brand-ink",
+                    )}
+                  >
+                    <RadioGroupItem id={`mode-${value}`} value={value} className="sr-only" />
+                    <Icon aria-hidden="true" className="size-4 shrink-0" />
+                    {label}
+                  </Label>
+                );
+              })}
             </RadioGroup>
           )}
         />

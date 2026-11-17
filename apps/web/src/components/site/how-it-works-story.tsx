@@ -57,7 +57,7 @@ function SearchScene() {
   ];
   return (
     <motion.div {...pop()} className="rounded-2xl bg-white p-5 shadow-[0_30px_60px_-35px_rgba(38,60,50,0.6)]">
-      <p className="text-sm font-semibold text-brand-ink">Rent a car for your dates</p>
+      <p className="text-sm font-semibold text-brand-ink">Where are you headed?</p>
       <div className="mt-4 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1 text-sm font-semibold">
         <span className="relative rounded-lg py-2 text-center text-muted-foreground">Self-drive</span>
         <span className="relative rounded-lg py-2 text-center text-brand-ink">
