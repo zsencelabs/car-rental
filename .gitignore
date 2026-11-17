@@ -21,3 +21,14 @@ Thumbs.db
 *.keystore
 *.dump
 *.sql.gz
+
+# Node / build output
+node_modules/
+.next/
+.turbo/
+out/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+next-env.d.ts

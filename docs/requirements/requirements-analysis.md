@@ -209,6 +209,7 @@ Pagination, background notification processing, image optimization, backups, err
 - **G32. Languages, accessibility level** (for example WCAG 2.1 AA), **supported browsers**.
 - **G33. Measurable non-functional targets.** "Fast vehicle search" has no target (for example p95 < 500 ms), and there's no RPO/RTO for backups or uptime target.
 - **G34. Company sub-accounts.** Staff users under a rental company with limited permissions.
+- **G36. Business Partners role [Gap].** The client's existing site (vehicle-rental-management-system.b12sites.com) shows a "Business partners" programme: businesses that "bring your customers", "arrange bookings for guests and earn on referred reservations". This role is **not in the SRS**. The public site shows it as "coming soon" only; no data model has been designed for it.
 - **G35. Branding.** The client's existing site uses the name "KAIYA Rentals". Is that the product name? See `docs/design/style-reference.md`.
 
 ---
@@ -362,4 +363,5 @@ References point to the SRS and to gaps above.
 28. In-app messaging and phone masking. (G30)
 29. Data retention periods. (G31)
 30. Non-functional targets: search latency, uptime, RPO/RTO, accessibility level. (G32, G33)
-31. Branding: is "KAIYA Rentals" the product name? Do you need dark mode? (G35)
+31. Branding: is "KAIYA Rentals" the product name? Do you need dark mode? (G35) *Update 2026-11-18: "KAIYA Rentals" confirmed for the UI.*
+32. **Business Partners:** is the referral/business-partner role (seen on the client site) in scope? If so: who can register, how referrals are attributed, how partner earnings are calculated and paid, and whether partners book on behalf of guests. (G36)

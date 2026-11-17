@@ -1,6 +1,6 @@
 # Visual style reference
 
-- **Status:** Reference captured; not yet applied (no frontend exists)
+- **Status:** Applied in `apps/web` (see `apps/web/src/app/globals.css`)
 - **Source:** the client's existing site, https://vehicle-rental-management-system.b12sites.com/ ("KAIYA Rentals | Find your way"), inspected 2026-11-18
 - **Method:** read the site's compiled stylesheet (`/_astro/index.*.css`) and the homepage HTML. Values below are copied from it, not estimated from screenshots.
 - **Scope:** colors, typography, radius and overall feel only. Don't copy the site's markup, copy text, images or other assets.
@@ -56,9 +56,10 @@ Literal hex colors also used on the site:
 The client site is **light-only** (`color-scheme: light`). Whether our product needs dark mode is an open question (requirements analysis Q31). If it does, derive dark tokens from the same hues (158/145/84) instead of inventing new brand colors.
 
 ## Accessibility notes
+- **Applied deviation (2026-11-18):** in the web app, `--muted-foreground` is `oklch(48% 0.025 161)` instead of the site's 55%, so secondary text meets WCAG AA on the cream background. The reference site also uses 8–10px text in places; the web app uses a 12px minimum.
 - Check contrast before use. `--muted-foreground` on `--background` and `#748078` on cream are mid-gray-green, so verify they reach WCAG AA (4.5:1) for body text at 14px.
 - Keep the green focus ring (`--ring`) visible on all interactive elements.
 
 ## Open questions
-- Is "KAIYA Rentals" the product name and logo for this platform? (Requirements analysis Q31)
+- ~~Is "KAIYA Rentals" the product name?~~ Confirmed 2026-11-18. The logo mark is still a placeholder "K" tile.
 - Should the admin and provider dashboards use the same palette, or a more neutral variant?

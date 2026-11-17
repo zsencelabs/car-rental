@@ -1,4 +1,27 @@
-# Hybrid Rental Marketplace — Audit Starter
+# KAIYA Rentals — Hybrid Rental Marketplace
+
+## Run the web app (public site preview)
+
+The first slice is the public customer website (`apps/web`) with **sample data**: no backend, sign-in or booking yet. See `docs/adr/002-monorepo-and-web-stack.md`.
+
+Requirements: Node 22+, and pnpm 10 via corepack (`corepack enable pnpm`).
+
+```bash
+pnpm install
+pnpm dev          # http://localhost:3000
+pnpm lint
+pnpm typecheck
+pnpm test         # Vitest unit tests
+pnpm build
+pnpm --filter @kaiya/web exec playwright install chromium   # once
+pnpm test:e2e     # Playwright (builds must exist: run `pnpm build` first)
+```
+
+Key docs: `docs/requirements/requirements-analysis.md` (open questions), `docs/design/style-reference.md` (theme), `docs/adr/`.
+
+---
+
+## Original audit workspace notes
 
 A professional project workspace for evaluating whether to extend
 [`aelassas/bookcars`](https://github.com/aelassas/bookcars) or build a new platform.

@@ -1,6 +1,6 @@
 # ADR-001: Build a new platform instead of extending BookCars
 
-- Status: **Proposed** (awaiting product owner approval)
+- Status: **Accepted** (2026-11-18, approved by the product owner)
 - Date: 2026-11-18
 - Decision owners: Product owner / tech lead
 
