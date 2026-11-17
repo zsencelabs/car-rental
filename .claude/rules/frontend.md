@@ -19,3 +19,4 @@ paths:
 - Keep API requests inside appropriate service or query layers.
 - Do not duplicate backend business logic.
 - Never trust client-side permissions or price calculations.
+- Follow the visual style in `docs/design/style-reference.md` (colors, fonts, radius).
