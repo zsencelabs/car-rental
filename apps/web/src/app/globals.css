@@ -1,0 +1,150 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: Georgia, "Times New Roman", serif;
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-mark: var(--brand-mark);
+  --color-tint-sand: var(--tint-sand);
+  --color-tint-sage: var(--tint-sage);
+  --color-tint-mist: var(--tint-mist);
+  --color-surface-cream: var(--surface-cream);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* KAIYA Rentals theme — values from docs/design/style-reference.md */
+  --background: oklch(98% 0.012 84);
+  --foreground: oklch(25% 0.025 161);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(25% 0.025 161);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(25% 0.025 161);
+  --primary: oklch(37% 0.065 158);
+  --primary-foreground: oklch(98.5% 0.004 84);
+  --secondary: oklch(95% 0.02 145);
+  --secondary-foreground: oklch(32% 0.045 158);
+  --muted: oklch(96% 0.012 84);
+  --muted-foreground: oklch(48% 0.025 161);
+  --accent: oklch(93% 0.038 145);
+  --accent-foreground: oklch(31% 0.05 158);
+  --destructive: oklch(55% 0.18 27);
+  --border: oklch(90% 0.016 154);
+  --input: oklch(90% 0.016 154);
+  --ring: oklch(57% 0.078 158);
+  --chart-1: oklch(37% 0.065 158);
+  --chart-2: oklch(57% 0.078 158);
+  --chart-3: oklch(72% 0.05 145);
+  --chart-4: oklch(80% 0.05 84);
+  --chart-5: oklch(55% 0.18 27);
+  --radius: 0.8rem;
+  --sidebar: oklch(98% 0.012 84);
+  --sidebar-foreground: oklch(25% 0.025 161);
+  --sidebar-primary: oklch(37% 0.065 158);
+  --sidebar-primary-foreground: oklch(98.5% 0.004 84);
+  --sidebar-accent: oklch(94% 0.026 148);
+  --sidebar-accent-foreground: oklch(31% 0.05 158);
+  --sidebar-border: oklch(91% 0.016 154);
+  --sidebar-ring: oklch(57% 0.078 158);
+
+  /* Brand accents (literal values from the client site) */
+  --brand-ink: #263c32;
+  --brand-accent: #63866c;
+  --brand-mark: #3e7054;
+  --tint-sand: #ede9dd;
+  --tint-sage: #e4ebe3;
+  --tint-mist: #e5e9e7;
+  --surface-cream: #f4efdf;
+
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer components {
+  /* Italic serif accent phrase inside headings, e.g. "Find your way. <em>We'll find the car.</em>" */
+  .heading-accent {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brand-accent);
+  }
+
+  .display-title {
+    color: var(--brand-ink);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 5vw, 4.05rem);
+    letter-spacing: -0.045em;
+    line-height: 0.99;
+  }
+
+  .section-title {
+    color: var(--brand-ink);
+    font-weight: 600;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #57715f;
+  }
+}
