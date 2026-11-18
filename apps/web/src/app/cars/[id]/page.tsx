@@ -169,9 +169,10 @@ export default async function CarDetailPage({ params }: PageProps<"/cars/[id]">)
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">{vehicle.summary}</p>
 
           <h2 className="mt-8 text-lg font-semibold text-brand-ink">Specifications</h2>
-          <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {[
               ["Seats", String(vehicle.seats)],
+              ["Luggage", `${vehicle.bags} large bags`],
               ["Transmission", capitalize(vehicle.transmission)],
               ["Fuel", capitalize(vehicle.fuel)],
               ["Included", `${vehicle.includedKmPerDay} km/day`],

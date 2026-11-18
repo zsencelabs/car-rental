@@ -4,15 +4,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "motion/react";
-import {
-  CalendarDaysIcon,
-  CheckIcon,
-  KeyRoundIcon,
-  MapPinIcon,
-  SearchIcon,
-  UsersRoundIcon,
-} from "lucide-react";
+import { CalendarDaysIcon, KeyRoundIcon, MapPinIcon, SearchIcon, UsersRoundIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -38,9 +30,6 @@ const MODE_OPTIONS = [
   { value: "SELF_DRIVE", label: "Self-drive", Icon: KeyRoundIcon },
   { value: "WITH_DRIVER", label: "With a driver", Icon: UsersRoundIcon },
 ] as const;
-
-const TRUST_POINTS = ["No hidden fees", "Deposit shown separately"] as const;
-
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -102,8 +91,6 @@ export function SearchForm({ locations }: { locations: Location[] }) {
     defaultValues: {
       mode: "SELF_DRIVE",
       pickupLocation: "",
-      sameReturn: true,
-      returnLocation: "",
       pickupDate: "",
       pickupTime: DEFAULT_TIME,
       returnDate: "",
@@ -111,9 +98,9 @@ export function SearchForm({ locations }: { locations: Location[] }) {
     },
   });
 
-  const [sameReturn, pickupDate, pickupTime, returnDate, returnTime] = useWatch({
+  const [pickupDate, pickupTime, returnDate, returnTime] = useWatch({
     control,
-    name: ["sameReturn", "pickupDate", "pickupTime", "returnDate", "returnTime"],
+    name: ["pickupDate", "pickupTime", "returnDate", "returnTime"],
   });
   const rentalLength =
     pickupDate && returnDate
@@ -127,7 +114,6 @@ export function SearchForm({ locations }: { locations: Location[] }) {
       pickupAt: joinDateTime(values.pickupDate, values.pickupTime),
       returnAt: joinDateTime(values.returnDate, values.returnTime),
     });
-    if (!values.sameReturn && values.returnLocation) params.set("returnLocation", values.returnLocation);
     router.push(`/cars?${params.toString()}`);
   };
 
@@ -138,53 +124,13 @@ export function SearchForm({ locations }: { locations: Location[] }) {
       aria-labelledby="search-heading"
       className="rounded-[20px] border border-white/70 bg-card p-5 shadow-[0_40px_80px_-40px_rgba(18,36,27,0.55)] sm:p-6 [@media(max-height:760px)]:py-4"
     >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="md:shrink-0">
-          <h2 id="search-heading" className="text-xl font-semibold tracking-tight text-brand-ink">
-            Where are you headed?
-          </h2>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Daily, weekly and monthly rates · self-drive or with a driver
-          </p>
-        </div>
+      <h2 id="search-heading" className="sr-only">
+        Where are you headed?
+      </h2>
 
-        <Controller
-          control={control}
-          name="mode"
-          render={({ field }) => (
-            <RadioGroup
-              value={field.value}
-              onValueChange={field.onChange}
-              aria-label="Rental type"
-              className="grid w-full grid-cols-2 gap-2 md:flex md:w-auto"
-            >
-              {MODE_OPTIONS.map(({ value, label, Icon }) => {
-                const selected = field.value === value;
-                return (
-                  <Label
-                    key={value}
-                    htmlFor={`mode-${value}`}
-                    className={cn(
-                      "flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
-                      selected
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-white text-[#3f5146] hover:border-primary/50 hover:text-brand-ink",
-                    )}
-                  >
-                    <RadioGroupItem id={`mode-${value}`} value={value} className="sr-only" />
-                    <Icon aria-hidden="true" className="size-4 shrink-0" />
-                    {label}
-                  </Label>
-                );
-              })}
-            </RadioGroup>
-          )}
-        />
-      </div>
-
-      <div className="mt-5 grid items-start gap-4 lg:grid-cols-[1fr_2.1fr_auto] [@media(max-height:760px)]:mt-4">
-        <div>
-          <Label htmlFor="pickupLocation" className="text-xs text-[#526257]">
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.3fr)] lg:gap-5">
+        <div className="min-w-0">
+          <Label htmlFor="pickupLocation" className="text-xs font-medium text-[#526257]">
             Pick-up location
           </Label>
           <Controller
@@ -196,7 +142,7 @@ export function SearchForm({ locations }: { locations: Location[] }) {
                 value={field.value}
                 onChange={field.onChange}
                 locations={locations}
-                placeholder="Where you'll collect the car"
+                placeholder="City, airport or station"
                 invalid={Boolean(errors.pickupLocation)}
               />
             )}
@@ -205,6 +151,7 @@ export function SearchForm({ locations }: { locations: Location[] }) {
         </div>
 
         <RentalDatesPicker
+          className="lg:gap-5"
           value={{ pickupDate, pickupTime, returnDate, returnTime }}
           onChange={(next) => {
             for (const [key, fieldValue] of Object.entries(next) as [keyof typeof next, string][]) {
@@ -214,87 +161,64 @@ export function SearchForm({ locations }: { locations: Location[] }) {
           pickupError={errors.pickupDate?.message}
           returnError={errors.returnDate?.message}
         />
+      </div>
 
-        <div className="lg:pt-6">
-          <Button type="submit" size="lg" className="h-12 w-full px-7 text-base" disabled={isSubmitting}>
+      <div className="mt-5 flex flex-col gap-4 border-t border-border pt-5 md:flex-row md:items-center [@media(max-height:760px)]:mt-4 [@media(max-height:760px)]:pt-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <span aria-hidden="true" className="text-xs font-medium whitespace-nowrap text-[#526257]">
+            Rental type
+          </span>
+          <Controller
+            control={control}
+            name="mode"
+            render={({ field }) => (
+              <RadioGroup
+                value={field.value}
+                onValueChange={field.onChange}
+                aria-label="Rental type"
+                className="grid grid-cols-2 gap-2 sm:flex"
+              >
+                {MODE_OPTIONS.map(({ value, label, Icon }) => {
+                  const selected = field.value === value;
+                  return (
+                    <Label
+                      key={value}
+                      htmlFor={`mode-${value}`}
+                      className={cn(
+                        "flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-ring/50",
+                        selected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-white text-[#3f5146] hover:border-primary/50 hover:text-brand-ink",
+                      )}
+                    >
+                      <RadioGroupItem id={`mode-${value}`} value={value} className="sr-only" />
+                      <Icon aria-hidden="true" className="size-4 shrink-0" />
+                      {label}
+                    </Label>
+                  );
+                })}
+              </RadioGroup>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:ml-auto">
+          <p
+            aria-live="polite"
+            data-rental-length
+            className={cn(
+              "inline-flex items-center gap-1.5 self-start rounded-full px-3 py-1 text-xs font-semibold sm:self-auto",
+              rentalLength ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground",
+            )}
+          >
+            <CalendarDaysIcon aria-hidden="true" className="size-3.5" />
+            {rentalLength ? `Rental length: ${rentalLength}` : "Choose dates to see rental length"}
+          </p>
+          <Button type="submit" size="lg" className="h-11 w-full px-7 text-base sm:w-auto" disabled={isSubmitting}>
             <SearchIcon aria-hidden="true" />
             Find cars
           </Button>
         </div>
-      </div>
-
-      <AnimatePresence initial={false}>
-        {sameReturn ? null : (
-          <motion.div
-            key="return-location"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden"
-          >
-            <div className="pt-4 lg:w-[calc((100%-2rem)*0.32)]">
-              <Label htmlFor="returnLocation" className="text-xs text-[#526257]">
-                Return location
-              </Label>
-              <Controller
-                control={control}
-                name="returnLocation"
-                render={({ field }) => (
-                  <LocationSelect
-                    id="returnLocation"
-                    value={field.value}
-                    onChange={field.onChange}
-                    locations={locations}
-                    placeholder="Where you'll return the car"
-                    invalid={Boolean(errors.returnLocation)}
-                  />
-                )}
-              />
-              <FieldError id="returnLocation-error" message={errors.returnLocation?.message} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2.5">
-        <Controller
-          control={control}
-          name="sameReturn"
-          render={({ field }) => (
-            <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-[#3f5146]">
-              <input
-                type="checkbox"
-                className="size-4 cursor-pointer accent-[var(--primary)]"
-                checked={field.value}
-                onChange={(event) => field.onChange(event.target.checked)}
-                onBlur={field.onBlur}
-                name={field.name}
-                ref={field.ref}
-              />
-              Return to the same location
-            </label>
-          )}
-        />
-        <p
-          aria-live="polite"
-          data-rental-length
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold",
-            rentalLength ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground",
-          )}
-        >
-          <CalendarDaysIcon aria-hidden="true" className="size-3.5" />
-          {rentalLength ? `Rental length: ${rentalLength}` : "Choose dates to see rental length"}
-        </p>
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground lg:ml-auto [@media(max-height:760px)]:hidden">
-          {TRUST_POINTS.map((point) => (
-            <li key={point} className="inline-flex items-center gap-1.5">
-              <CheckIcon aria-hidden="true" className="size-3.5 text-primary" />
-              {point}
-            </li>
-          ))}
-        </ul>
       </div>
     </form>
   );

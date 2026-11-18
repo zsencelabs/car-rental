@@ -82,6 +82,8 @@ export interface Vehicle {
   transmission: Transmission;
   fuel: FuelType;
   seats: number;
+  /** Large bags that fit in the boot. Sample data for the preview. */
+  bags: number;
   features: string[];
   /** Which rental modes the provider allows for this vehicle (SRS §6.2). */
   allowedModes: RentalMode[];
@@ -114,6 +116,8 @@ export interface DriverProfile {
   id: string;
   name: string;
   initials: string;
+  /** Sample profile photo for the preview; real drivers upload their own. */
+  photo?: string;
   yearsExperience: number;
   licenseCategory: string;
   languages: string[];

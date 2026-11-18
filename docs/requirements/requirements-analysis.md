@@ -330,6 +330,8 @@ The public preview site (`apps/web`, sample data, UI only) now represents these 
 - **§4.4:** gallery (exterior and interior), rates, deposit, mileage, fuel, cancellation, insurance, requirements, drop-off options, indicative availability calendar, provider info and reviews.
 - **§5.2:** public driver profile fields, with the license category only.
 
+- **Search box (2026-11-18):** the home search asks for a pick-up location only. The separate return location was removed at the client's request, so SRS §4.2 "pickup and return locations" is only partly shown in the UI. See question 33.
+
 Still not built: authentication, booking, payments, provider/driver/admin portals, and every backend rule. Those wait on the P0/P1 questions below.
 
 ## 12. Prioritized questions for the product owner
@@ -374,3 +376,4 @@ References point to the SRS and to gaps above.
 30. Non-functional targets: search latency, uptime, RPO/RTO, accessibility level. (G32, G33)
 31. Branding: is "KAIYA Rentals" the product name? Do you need dark mode? (G35) *Update 2026-11-18: "KAIYA Rentals" confirmed for the UI.*
 32. **Business Partners:** is the referral/business-partner role (seen on the client site) in scope? If so: who can register, how referrals are attributed, how partner earnings are calculated and paid, and whether partners book on behalf of guests. (G36)
+33. **Return location:** the home search now has a pick-up location only. Are one-way rentals (return somewhere else) in scope? If so, should the return location be chosen at booking time, and can each vehicle allow or block it (R-VH-3)?

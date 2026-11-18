@@ -62,6 +62,7 @@ The client site is **light-only** (`color-scheme: light`). Whether our product n
 
 ## Photography (added 2026-11-18)
 - **Cars:** real photos of each exact model, from Wikimedia Commons (CC BY / CC BY-SA, credited on `/credits`). Front three-quarter shot as the cover, then rear and interior. When a model's own interior isn't available, a generic interior is used and labelled "representative photo".
+- **Category cards (added 2026-11-19):** one mood photo per category in `public/images/categories/`, chosen to match the client's reference layout: a single car in a colourful or atmospheric setting. These don't need to be the exact listed models. Prefer professional, editorial shots: Unsplash photos mirrored on Wikimedia Commons under CC0 (titles end in "(Unsplash)") work well. Same credit rules as above.
 - **Lifestyle and destinations:** rawpixel CC0 photos. Dusk and golden-hour tones fit the green-and-cream palette.
 - **People:** no identifiable faces on sample driver or reviewer profiles. Initials avatars are used instead, because stock licenses don't cover presenting a real person as a fictional driver. Lifestyle shots show drivers from behind.
 - Images live in `apps/web/public/images/`, sized to a maximum of 1600px and served through `next/image`.
