@@ -39,17 +39,12 @@ export function createSearchFormSchema(now: () => Date = () => new Date()) {
     .object({
       mode: z.enum(RENTAL_MODES),
       pickupLocation: z.string().min(1, "Choose where to collect the car"),
-      sameReturn: z.boolean(),
-      returnLocation: z.string(),
       pickupDate: z.string().regex(DATE, "Choose a pick-up date"),
       pickupTime: z.string().regex(TIME, "Choose a time"),
       returnDate: z.string().regex(DATE, "Choose a return date"),
       returnTime: z.string().regex(TIME, "Choose a time"),
     })
     .superRefine((value, ctx) => {
-      if (!value.sameReturn && value.returnLocation.length === 0) {
-        ctx.addIssue({ code: "custom", path: ["returnLocation"], message: "Choose where to return the car" });
-      }
       if (!DATE.test(value.pickupDate) || !DATE.test(value.returnDate)) return;
       const pickup = new Date(joinDateTime(value.pickupDate, value.pickupTime));
       const dropoff = new Date(joinDateTime(value.returnDate, value.returnTime));
@@ -96,8 +91,6 @@ const optionalPositiveInt = z.coerce.number().int().positive().optional().catch(
 export const searchParamsSchema = z.object({
   mode: z.enum(RENTAL_MODES).catch("SELF_DRIVE"),
   location: z.string().min(1).optional().catch(undefined),
-  /** Return location when different from pick-up. Kept for the booking step; not a search filter. */
-  returnLocation: z.string().min(1).optional().catch(undefined),
   pickupAt: dateTimeField.optional().catch(undefined),
   returnAt: dateTimeField.optional().catch(undefined),
   category: optionalEnum(VEHICLE_CATEGORIES),

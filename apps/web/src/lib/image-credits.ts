@@ -302,5 +302,59 @@ export const imageCredits: ImageCredit[] = [
     "sourceUrl": "https://www.rawpixel.com/image/6042827/photo-image-public-domain-woman-free",
     "license": "CC0 1.0 (public domain)",
     "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/categories/suv-jeep.jpg",
+    "title": "Black jeep Nevada desert (Unsplash)",
+    "creator": "Nicolas Cool (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61867434",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en/"
+  },
+  {
+    "file": "/images/categories/sedan.jpg",
+    "title": "White Tesla Model 3 on W Lone Mountain Rd",
+    "creator": "Noah Wulf",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=117750358",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+    "file": "/images/categories/luxury-porsche.jpg",
+    "title": "Porsche (Unsplash)",
+    "creator": "Julian Friedle (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=62283701",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en/"
+  },
+  {
+    "file": "/images/categories/van-vw-t1.jpg",
+    "title": "Volkswagen T1 Bus (Unsplash)",
+    "creator": "Frank Albrecht (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61756625",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en/"
+  },
+  {
+    "file": "/images/categories/hatchback-mini.jpg",
+    "title": "Mini cooper s matt black (Unsplash)",
+    "creator": "Dmitry Strelkov (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=62283176",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/categories/electric.jpg",
+    "title": "Polestar 2 facelift 001",
+    "creator": "JustAnotherCarDesigner",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=131012123",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
   }
 ];

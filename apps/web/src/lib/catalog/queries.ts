@@ -9,10 +9,11 @@
  * any eligibility/availability decisions must happen server-side and be
  * revalidated at booking confirmation (CLAUDE.md, .claude/rules/domain.md).
  */
-import type { SearchParams } from "@/lib/search-schema";
+import { categoryLinks } from "@/lib/site-config";
+import { parseSearchParams, type SearchParams } from "@/lib/search-schema";
 import { compareMoney, toMinorUnits } from "./money";
 import { drivers, locations, providers, sampleReviews, vehicles } from "./mock-data";
-import type { DriverProfile, Location, Provider, SampleReview, Vehicle } from "./types";
+import type { DriverProfile, Location, Money, Provider, SampleReview, Vehicle } from "./types";
 
 export async function listLocations(): Promise<Location[]> {
   return locations;
@@ -78,6 +79,31 @@ export function filterAndSortVehicles(all: Vehicle[], params: VehicleFilters): V
       break;
   }
   return sorted;
+}
+
+export interface CategorySummary {
+  href: string;
+  count: number;
+  /** Lowest daily rate among the matching listings; undefined when nothing matches. */
+  fromRate?: Money;
+}
+
+/**
+ * What a category link on the home page leads to: how many listings it shows and
+ * the lowest daily rate. Uses the same URL parsing and filters as the /cars page.
+ */
+export function summarizeCategoryLink(all: Vehicle[], href: string): CategorySummary {
+  const query = new URLSearchParams(href.split("?")[1] ?? "");
+  const matches = filterAndSortVehicles(all, parseSearchParams(Object.fromEntries(query)));
+  const fromRate = matches.reduce<Money | undefined>(
+    (lowest, vehicle) => (!lowest || compareMoney(vehicle.dailyRate, lowest) < 0 ? vehicle.dailyRate : lowest),
+    undefined,
+  );
+  return { href, count: matches.length, fromRate };
+}
+
+export async function listCategorySummaries(): Promise<CategorySummary[]> {
+  return categoryLinks.map((link) => summarizeCategoryLink(vehicles, link.href));
 }
 
 /**

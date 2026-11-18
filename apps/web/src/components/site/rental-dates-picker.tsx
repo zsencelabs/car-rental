@@ -18,12 +18,10 @@ import {
 import {
   formatShortDate,
   fromIsoDate,
-  QUICK_DURATIONS,
-  quickRange,
   startOfDay,
   toIsoDate,
 } from "@/lib/rental-dates";
-import { formatRentalLength, joinDateTime, TIME_SLOTS } from "@/lib/search-schema";
+import { TIME_SLOTS } from "@/lib/search-schema";
 import { cn } from "@/lib/utils";
 
 export interface RentalDatesValue {
@@ -38,6 +36,8 @@ interface RentalDatesPickerProps {
   onChange: (next: Partial<RentalDatesValue>) => void;
   pickupError?: string;
   returnError?: string;
+  /** Extra classes for the two-field grid, so the parent can place it in its own layout. */
+  className?: string;
 }
 
 type End = "pickup" | "return";
@@ -77,75 +77,77 @@ function TimeSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <div>
-      <Label htmlFor={id} className="text-xs text-[#526257]">
-        {label}
-      </Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger
-          id={id}
-          className="mt-2 w-full justify-start bg-background data-[size=default]:h-11 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:text-left"
-        >
-          <ClockIcon aria-hidden="true" className="size-4 text-primary" />
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent position="popper" className="max-h-64">
-          {TIME_SLOTS.map((slot) => (
-            <SelectItem key={slot} value={slot} className="py-2">
-              {slot}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger
+        id={id}
+        aria-label={label}
+        className="w-full justify-start bg-background data-[size=default]:h-12 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:text-left"
+      >
+        <ClockIcon aria-hidden="true" className="size-4 text-primary" />
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent position="popper" className="max-h-64">
+        {TIME_SLOTS.map((slot) => (
+          <SelectItem key={slot} value={slot} className="py-2">
+            {slot}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
-function Trigger({
+/** One end of the rental: a date button that opens the picker, with its own time list beside it. */
+function DateTimeField({
   id,
   label,
+  timeLabel,
   date,
   time,
+  onTimeChange,
   error,
   active,
   onOpen,
 }: {
   id: string;
   label: string;
+  timeLabel: string;
   date: Date | undefined;
   time: string;
+  onTimeChange: (time: string) => void;
   error?: string;
   active: boolean;
   onOpen: () => void;
 }) {
+  const timeId = id.replace("Date", "Time");
   return (
     <div className="min-w-0">
-      <Label htmlFor={id} className="text-xs text-[#526257]">
+      <Label htmlFor={id} className="text-xs font-medium text-[#526257]">
         {label}
       </Label>
-      <button
-        id={id}
-        type="button"
-        onClick={onOpen}
-        aria-haspopup="dialog"
-        aria-expanded={active}
-        aria-describedby={error ? `${id}-error` : undefined}
-        className={cn(
-          "mt-2 flex h-12 w-full items-center gap-3 rounded-lg border bg-background px-3 text-left transition-colors outline-none hover:border-[#c9d6cc] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-          active ? "border-primary ring-3 ring-primary/15" : "border-input",
-          error && "border-destructive",
-        )}
-      >
-        <CalendarDaysIcon aria-hidden="true" className="size-4 shrink-0 text-primary" />
-        {date ? (
-          <span className="min-w-0 truncate text-sm font-medium text-brand-ink">
-            {formatShortDate(date)}
-            <span className="font-normal text-muted-foreground"> · {time}</span>
-          </span>
-        ) : (
-          <span className="text-sm text-muted-foreground">Add date</span>
-        )}
-      </button>
+      <div className="mt-2 grid grid-cols-[minmax(0,1fr)_7.5rem] gap-2">
+        <button
+          id={id}
+          type="button"
+          onClick={onOpen}
+          aria-haspopup="dialog"
+          aria-expanded={active}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className={cn(
+            "flex h-12 w-full items-center gap-2.5 rounded-lg border bg-background px-3 text-left transition-colors outline-none hover:border-[#c9d6cc] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+            active ? "border-primary ring-3 ring-primary/15" : "border-input",
+            error && "border-destructive",
+          )}
+        >
+          <CalendarDaysIcon aria-hidden="true" className="size-4 shrink-0 text-primary" />
+          {date ? (
+            <span className="min-w-0 truncate text-sm font-medium text-brand-ink">{formatShortDate(date)}</span>
+          ) : (
+            <span className="truncate text-sm text-muted-foreground">Add date</span>
+          )}
+        </button>
+        <TimeSelect id={timeId} label={timeLabel} value={time} onChange={onTimeChange} />
+      </div>
       {error ? (
         <p id={`${id}-error`} role="alert" className="mt-1.5 text-xs font-medium text-destructive">
           {error}
@@ -159,7 +161,7 @@ function Trigger({
  * Pick-up and return date/time fields sharing one branded popover:
  * range calendar, quick durations, time lists and a live rental length.
  */
-export function RentalDatesPicker({ value, onChange, pickupError, returnError }: RentalDatesPickerProps) {
+export function RentalDatesPicker({ value, onChange, pickupError, returnError, className }: RentalDatesPickerProps) {
   const [open, setOpen] = useState(false);
   const [activeEnd, setActiveEnd] = useState<End>("pickup");
   const months = useMonthsToShow();
@@ -167,14 +169,6 @@ export function RentalDatesPicker({ value, onChange, pickupError, returnError }:
 
   const from = fromIsoDate(value.pickupDate);
   const to = fromIsoDate(value.returnDate);
-
-  const rentalLength =
-    value.pickupDate && value.returnDate
-      ? formatRentalLength(
-          joinDateTime(value.pickupDate, value.pickupTime),
-          joinDateTime(value.returnDate, value.returnTime),
-        )
-      : undefined;
 
   const openAt = (end: End) => {
     setActiveEnd(end);
@@ -186,21 +180,25 @@ export function RentalDatesPicker({ value, onChange, pickupError, returnError }:
     <>
     <Popover open={open && !isPhone} onOpenChange={setOpen}>
       <PopoverAnchor asChild>
-        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-          <Trigger
+        <div className={cn("grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2", className)}>
+          <DateTimeField
             id="pickupDate"
-            label="Pick-up"
+            label="Pick-up date & time"
+            timeLabel="Pick-up time"
             date={from}
             time={value.pickupTime}
+            onTimeChange={(pickupTime) => onChange({ pickupTime })}
             error={pickupError}
             active={open && activeEnd === "pickup"}
             onOpen={() => openAt("pickup")}
           />
-          <Trigger
+          <DateTimeField
             id="returnDate"
-            label="Return"
+            label="Return date & time"
+            timeLabel="Return time"
             date={to}
             time={value.returnTime}
+            onTimeChange={(returnTime) => onChange({ returnTime })}
             error={returnError}
             active={open && activeEnd === "return"}
             onOpen={() => openAt("return")}
@@ -216,14 +214,11 @@ export function RentalDatesPicker({ value, onChange, pickupError, returnError }:
         className="w-auto max-w-[min(860px,calc(100vw-2rem))] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto rounded-[20px] border border-[#e5eae3] bg-card p-0 shadow-[0_30px_70px_-30px_rgba(18,36,27,0.55)] sm:w-auto"
       >
         <PickerPanel
-          value={value}
           onChange={onChange}
           from={from}
           to={to}
           months={months}
-          activeEnd={activeEnd}
           setActiveEnd={setActiveEnd}
-          rentalLength={rentalLength}
           onDone={() => setOpen(false)}
         />
       </PopoverContent>
@@ -237,14 +232,11 @@ export function RentalDatesPicker({ value, onChange, pickupError, returnError }:
         <SheetDescription className="sr-only">Choose pick-up and return dates and times</SheetDescription>
         <div aria-hidden="true" className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border" />
           <PickerPanel
-          value={value}
           onChange={onChange}
           from={from}
           to={to}
           months={months}
-          activeEnd={activeEnd}
           setActiveEnd={setActiveEnd}
-          rentalLength={rentalLength}
           onDone={() => setOpen(false)}
         />
       </SheetContent>
@@ -254,29 +246,16 @@ export function RentalDatesPicker({ value, onChange, pickupError, returnError }:
 }
 
 interface PickerPanelProps {
-  value: RentalDatesValue;
   onChange: (next: Partial<RentalDatesValue>) => void;
   from: Date | undefined;
   to: Date | undefined;
   months: number;
-  activeEnd: End;
   setActiveEnd: (end: End) => void;
-  rentalLength: string | undefined;
   onDone: () => void;
 }
 
-/** Popover body. Mounted only while open, so "today" is read in the browser, never during prerender. */
-function PickerPanel({
-  value,
-  onChange,
-  from,
-  to,
-  months,
-  activeEnd,
-  setActiveEnd,
-  rentalLength,
-  onDone,
-}: PickerPanelProps) {
+/** Popover body: just the calendar, Clear and Done. Mounted only while open, so "today" is read in the browser. */
+function PickerPanel({ onChange, from, to, months, setActiveEnd, onDone }: PickerPanelProps) {
   const [today] = useState(() => startOfDay(new Date()));
   const selected: DateRange | undefined = from ? { from, to } : undefined;
 
@@ -290,107 +269,54 @@ function PickerPanel({
 
   return (
     <>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4 [@media(max-height:760px)]:py-3">
-          <div>
-            <h3 id="rental-dates-title" className="text-base font-semibold text-brand-ink">
-              Select your rental dates
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              {from && to
-                ? "Adjust times or tap Done"
-                : activeEnd === "pickup" || !from
-                  ? "Choose your pick-up day"
-                  : "Now choose your return day"}
-            </p>
-          </div>
-          <p
-            aria-live="polite"
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold",
-              rentalLength ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground",
-            )}
-          >
-            <CalendarDaysIcon aria-hidden="true" className="size-3.5" />
-            {rentalLength ? `Rental length: ${rentalLength}` : "No dates selected"}
-          </p>
-        </div>
+      <h3 id="rental-dates-title" className="sr-only">
+        Select your rental dates
+      </h3>
+      <div className="px-5 pt-5 pb-4 sm:px-6 [@media(max-height:820px)]:pt-3 [@media(max-height:820px)]:pb-2">
+        <Calendar
+          mode="range"
+          selected={selected}
+          onSelect={handleSelect}
+          resetOnSelect
+          showOutsideDays={false}
+          numberOfMonths={months}
+          defaultMonth={from ?? today}
+          disabled={{ before: today }}
+          weekStartsOn={1}
+          className="mx-auto bg-transparent p-0 [--cell-radius:9999px] [--cell-size:--spacing(10)] [@media(max-height:820px)]:[--cell-size:--spacing(8)] [&_button:not(:focus-visible)]:!ring-0 [&_button[data-range-middle=true]]:!bg-secondary/60"
+          classNames={{
+            months: "relative flex flex-col gap-10 md:flex-row",
+            month_caption: "flex h-10 w-full items-center justify-center px-10",
+            caption_label: "text-sm font-medium text-brand-ink",
+            weekday: "flex-1 pb-2 text-[11px] font-normal text-muted-foreground/70 select-none",
+            week: "mt-0.5 flex w-full",
+            range_start:
+              "relative isolate z-0 rounded-l-full bg-secondary/60 after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-secondary/60",
+            range_middle: "rounded-none",
+            range_end:
+              "relative isolate z-0 rounded-r-full bg-secondary/60 after:absolute after:inset-y-0 after:left-0 after:w-4 after:bg-secondary/60",
+            today: "font-semibold",
+            disabled: "text-muted-foreground opacity-30",
+          }}
+        />
+      </div>
 
-        <div className="flex flex-col md:flex-row">
-          <div className="px-3 pt-3 pb-1 sm:px-5 sm:pt-4 [@media(max-height:760px)]:pt-2">
-            <Calendar
-              mode="range"
-              selected={selected}
-              onSelect={handleSelect}
-              resetOnSelect
-              numberOfMonths={months}
-              defaultMonth={from ?? today}
-              disabled={{ before: today }}
-              weekStartsOn={1}
-              className="mx-auto bg-transparent p-0 [--cell-radius:10px] [--cell-size:--spacing(10)] [@media(max-height:760px)]:[--cell-size:--spacing(8)]"
-              classNames={{
-                months: "relative flex flex-col gap-6 md:flex-row",
-                month_caption: "flex h-10 w-full items-center justify-center px-10",
-                caption_label: "text-sm font-semibold text-brand-ink",
-                weekday: "flex-1 text-[0.72rem] font-medium tracking-wide text-muted-foreground uppercase select-none",
-                week: "mt-1.5 flex w-full",
-                today: "rounded-(--cell-radius) font-semibold text-primary ring-1 ring-primary/30 ring-inset data-[selected=true]:ring-0",
-                disabled: "text-muted-foreground opacity-35",
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-5 border-t border-border p-5 md:w-60 md:border-t-0 md:border-l [@media(max-height:760px)]:gap-3 [@media(max-height:760px)]:py-3">
-            <div>
-              <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Quick picks</p>
-              <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
-                {QUICK_DURATIONS.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => {
-                      const range = quickRange(option.id, today, option.id === "weekend" ? undefined : from);
-                      onChange({ pickupDate: toIsoDate(range.from), returnDate: toIsoDate(range.to) });
-                      setActiveEnd("pickup");
-                    }}
-                    className="shrink-0 rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium text-[#3f5146] transition-colors hover:border-primary hover:bg-secondary hover:text-brand-ink focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-1">
-              <TimeSelect
-                id="pickupTime"
-                label="Pick-up time"
-                value={value.pickupTime}
-                onChange={(pickupTime) => onChange({ pickupTime })}
-              />
-              <TimeSelect
-                id="returnTime"
-                label="Return time"
-                value={value.returnTime}
-                onChange={(returnTime) => onChange({ returnTime })}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-border bg-card px-5 py-3.5 [@media(max-height:760px)]:py-2.5">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => {
-              onChange({ pickupDate: "", returnDate: "" });
-              setActiveEnd("pickup");
-            }}
-          >
-            Clear dates
-          </Button>
-          <Button type="button" className="h-10 px-6" onClick={onDone}>
-            Done
-          </Button>
-        </div>
+      <div className="sticky bottom-0 flex items-center justify-between border-t border-border/70 bg-card px-5 py-3 sm:px-6 [@media(max-height:820px)]:py-2">
+        <button
+          type="button"
+          aria-label="Clear dates"
+          onClick={() => {
+            onChange({ pickupDate: "", returnDate: "" });
+            setActiveEnd("pickup");
+          }}
+          className="rounded-md px-1 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-brand-ink hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+        >
+          Clear
+        </button>
+        <Button type="button" size="sm" className="h-9 px-5" onClick={onDone}>
+          Done
+        </Button>
+      </div>
     </>
   );
 }

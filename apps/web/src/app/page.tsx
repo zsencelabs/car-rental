@@ -15,6 +15,7 @@ import { HowItWorksStory } from "@/components/site/how-it-works-story";
 import { Reveal } from "@/components/motion/reveal";
 import {
   getBestWeeklySaving,
+  listCategorySummaries,
   listFeaturedDrivers,
   listFeaturedVehicles,
   listLocations,
@@ -26,23 +27,24 @@ function Section({ children, className = "" }: { children: React.ReactNode; clas
 }
 
 export default async function HomePage() {
-  const [locations, featured, drivers, reviews, saving] = await Promise.all([
+  const [locations, featured, drivers, reviews, saving, categorySummaries] = await Promise.all([
     listLocations(),
     listFeaturedVehicles(),
     listFeaturedDrivers(4),
     listSampleReviews(),
     getBestWeeklySaving(),
+    listCategorySummaries(),
   ]);
 
   return (
     <>
       <HomeHero locations={locations} />
 
-      <Section className="pt-16 pb-6">
+      <Section className="pt-14 md:pt-16">
         <ValueStrip />
       </Section>
 
-      <Section className="py-20">
+      <Section className="pt-14 pb-20 md:pt-16">
         <SectionHeading
           eyebrow="Browse by category"
           title="The right car"
@@ -50,7 +52,7 @@ export default async function HomePage() {
           action={{ href: "/cars", label: "All cars" }}
         />
         <div className="mt-10">
-          <CategoryGrid />
+          <CategoryGrid summaries={categorySummaries} />
         </div>
       </Section>
 
@@ -71,7 +73,7 @@ export default async function HomePage() {
       </Section>
 
       <section aria-labelledby="story-heading" className="border-y border-border bg-[#f3f1e8]">
-        <div className="mx-auto w-full max-w-[1240px] px-4 pt-24 sm:px-6">
+        <div className="mx-auto w-full max-w-[1240px] px-4 pt-20 pb-12 sm:px-6">
           <Reveal className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">How KAIYA works</p>
             <h2 id="story-heading" className="section-title mt-3">
@@ -82,7 +84,7 @@ export default async function HomePage() {
               bring them together, check both, and confirm only when everything lines up.
             </p>
           </Reveal>
-          <div className="mt-6 pb-16">
+          <div className="mt-10">
             <HowItWorksStory />
           </div>
         </div>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CogIcon, FuelIcon, StarIcon, UsersIcon } from "lucide-react";
+import { BriefcaseIcon, FuelIcon, GaugeIcon, UsersRoundIcon } from "lucide-react";
 import { formatMoney } from "@/lib/catalog/money";
 import { CATEGORY_LABELS, type RentalMode, type Vehicle } from "@/lib/catalog/types";
 import { modeLabel } from "@/lib/search-schema";
@@ -17,15 +17,22 @@ interface CarCardProps {
 export function CarCard({ vehicle, mode, priority = false, className }: CarCardProps) {
   const href = mode ? `/cars/${vehicle.id}?mode=${mode}` : `/cars/${vehicle.id}`;
   const cover = vehicle.images[0];
+  const transmission = vehicle.transmission === "automatic" ? "Auto" : "Manual";
+  const specs = [
+    { Icon: UsersRoundIcon, label: String(vehicle.seats), srLabel: `${vehicle.seats} seats` },
+    { Icon: BriefcaseIcon, label: String(vehicle.bags), srLabel: `${vehicle.bags} large bags` },
+    { Icon: GaugeIcon, label: transmission, srLabel: `${capitalize(vehicle.transmission)} transmission` },
+    { Icon: FuelIcon, label: capitalize(vehicle.fuel), srLabel: `${capitalize(vehicle.fuel)} fuel` },
+  ];
 
   return (
     <article
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-[16px] border border-[#e7eae3] bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_rgba(38,60,50,0.55)]",
+        "group relative flex flex-col overflow-hidden rounded-[16px] border border-border bg-card transition-shadow duration-300 hover:shadow-[0_18px_40px_-28px_rgba(18,36,27,0.45)] has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring/50",
         className,
       )}
     >
-      <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
+      <div className="relative aspect-[16/9] overflow-hidden bg-secondary">
         {cover ? (
           <Image
             src={cover.src}
@@ -36,63 +43,40 @@ export function CarCard({ vehicle, mode, priority = false, className }: CarCardP
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : null}
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-          {vehicle.allowedModes.map((allowed) => (
-            <span
-              key={allowed}
-              className="rounded-full bg-white/95 px-2.5 py-1 text-[0.7rem] font-semibold text-[#3f5146] shadow-sm"
-            >
-              {modeLabel(allowed)}
-            </span>
-          ))}
-        </div>
-        <p className="absolute right-3 bottom-3 flex items-center gap-1 rounded-full bg-black/45 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
-          <StarIcon aria-hidden="true" className="size-3.5 fill-[#f0c96b] text-[#f0c96b]" />
-          {vehicle.rating.toFixed(1)}
-          <span className="font-normal text-white/80">({vehicle.reviewCount})</span>
-          <span className="sr-only">out of 5 from {vehicle.reviewCount} reviews</span>
-        </p>
+        <span className="absolute top-2.5 left-2.5 rounded-full bg-[rgba(18,36,27,0.72)] px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-sm">
+          {CATEGORY_LABELS[vehicle.category]}
+        </span>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <div>
-          <h3 className="text-base font-bold text-[#2c3f34]">
-            <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none">
-              {vehicle.name}
-            </Link>
-          </h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {vehicle.year} · {CATEGORY_LABELS[vehicle.category]}
-          </p>
-        </div>
+      <div className="flex flex-1 flex-col px-[18px] pt-5 pb-5">
+        <h3 className="text-[17px] font-semibold text-brand-ink">
+          <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none">
+            {vehicle.name}
+          </Link>
+        </h3>
+        <p className="mt-1 line-clamp-1 text-[13px] text-muted-foreground">{vehicle.summary}</p>
 
-        <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-y border-[#f0f1ee] py-3 text-xs text-muted-foreground">
-          <li className="inline-flex items-center gap-1.5">
-            <UsersIcon aria-hidden="true" className="size-3.5" />
-            {vehicle.seats} seats
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <CogIcon aria-hidden="true" className="size-3.5" />
-            {capitalize(vehicle.transmission)}
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <FuelIcon aria-hidden="true" className="size-3.5" />
-            {capitalize(vehicle.fuel)}
-          </li>
+        <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
+          {specs.map(({ Icon, label, srLabel }) => (
+            <li key={srLabel} className="inline-flex items-center gap-1.5">
+              <Icon aria-hidden="true" strokeWidth={1.75} className="size-4" />
+              <span aria-hidden="true">{label}</span>
+              <span className="sr-only">{srLabel}</span>
+            </li>
+          ))}
         </ul>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
-          <p className="text-sm text-muted-foreground">
-            From{" "}
-            <span className="text-lg font-bold text-brand-ink">
-              {formatMoney(vehicle.dailyRate, { compact: true })}
-            </span>{" "}
-            / day
-          </p>
-          <span className="text-sm font-semibold text-primary transition-transform group-hover:translate-x-0.5">
-            View details →
-          </span>
+        <div className="mt-auto pt-5">
+          <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
+            <p className="text-xs text-muted-foreground">{vehicle.allowedModes.map(modeLabel).join(" · ")}</p>
+            <p className="shrink-0 text-right">
+              <span className="sr-only">From </span>
+              <span className="text-lg font-bold text-brand-ink">
+                {formatMoney(vehicle.dailyRate, { compact: true })}
+              </span>
+              <span className="text-xs text-muted-foreground">/day</span>
+            </p>
+          </div>
         </div>
       </div>
     </article>

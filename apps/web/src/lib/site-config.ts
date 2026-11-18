@@ -26,12 +26,12 @@ export const rentLinks = [
 ] as const;
 
 export const categoryLinks = [
-  { href: "/cars?category=suv", label: "SUV", image: "/images/cars/volvo-xc60/front.jpg" },
-  { href: "/cars?category=sedan", label: "Sedan", image: "/images/cars/toyota-corolla/front.jpg" },
-  { href: "/cars?category=luxury", label: "Luxury", image: "/images/cars/mercedes-e-class/front.jpg" },
-  { href: "/cars?category=van&mode=WITH_DRIVER", label: "Van", image: "/images/cars/toyota-hiace/front.jpg" },
-  { href: "/cars?category=hatchback", label: "Hatchback", image: "/images/cars/suzuki-swift/front.jpg" },
-  { href: "/cars?fuel=electric", label: "Electric", image: "/images/cars/tesla-model-3/front.jpg" },
+  { href: "/cars?category=suv", label: "SUV", image: "/images/categories/suv-jeep.jpg" },
+  { href: "/cars?category=sedan", label: "Sedan", image: "/images/categories/sedan.jpg" },
+  { href: "/cars?category=luxury", label: "Luxury", image: "/images/categories/luxury-porsche.jpg", imagePosition: "30% 50%" },
+  { href: "/cars?category=van&mode=WITH_DRIVER", label: "Van", image: "/images/categories/van-vw-t1.jpg" },
+  { href: "/cars?category=hatchback", label: "Hatchback", image: "/images/categories/hatchback-mini.jpg", imagePosition: "15% 50%" },
+  { href: "/cars?fuel=electric", label: "Electric", image: "/images/categories/electric.jpg" },
 ] as const;
 
 export const partnerLinks = [

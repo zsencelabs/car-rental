@@ -9,6 +9,7 @@ import {
   getVehicle,
   listFeaturedDrivers,
   rankDriversForCity,
+  summarizeCategoryLink,
 } from "./queries";
 
 describe("money helpers", () => {
@@ -146,5 +147,30 @@ describe("catalog data integrity", () => {
     expect(featured.every((driver) => driver.available)).toBe(true);
     const scores = featured.map((driver) => driver.performanceScore);
     expect(scores).toEqual([...scores].sort((a, b) => b - a));
+  });
+});
+
+describe("category link summaries", () => {
+  const lowestRate = (list: typeof vehicles) =>
+    [...list].sort((a, b) => compareMoney(a.dailyRate, b.dailyRate))[0]?.dailyRate;
+
+  it("counts self-drive listings in a category and finds the lowest daily rate", () => {
+    const expected = vehicles.filter((v) => v.category === "suv" && v.allowedModes.includes("SELF_DRIVE"));
+    const summary = summarizeCategoryLink(vehicles, "/cars?category=suv");
+    expect(summary.count).toBe(expected.length);
+    expect(summary.count).toBeGreaterThan(0);
+    expect(summary.fromRate).toEqual(lowestRate(expected));
+  });
+
+  it("applies fuel and mode filters from the link", () => {
+    const electric = vehicles.filter((v) => v.fuel === "electric" && v.allowedModes.includes("SELF_DRIVE"));
+    expect(summarizeCategoryLink(vehicles, "/cars?fuel=electric").count).toBe(electric.length);
+    const vans = vehicles.filter((v) => v.category === "van" && v.allowedModes.includes("WITH_DRIVER"));
+    expect(summarizeCategoryLink(vehicles, "/cars?category=van&mode=WITH_DRIVER").count).toBe(vans.length);
+  });
+
+  it("returns zero and no rate when nothing matches", () => {
+    const summary = summarizeCategoryLink([], "/cars?category=suv");
+    expect(summary).toEqual({ href: "/cars?category=suv", count: 0, fromRate: undefined });
   });
 });

@@ -215,30 +215,13 @@ test("booking box fits inside the hero banner on short laptop screens", async ({
   }
 });
 
-test("returning elsewhere reveals a required return location", async ({ page }) => {
-  await page.goto("/");
-  await page.waitForLoadState("networkidle");
-  await expect(page.getByRole("combobox", { name: "Return location" })).toHaveCount(0);
-  await page.getByLabel("Return to the same location").uncheck();
-  await expect(page.getByRole("combobox", { name: "Return location" })).toBeVisible();
-  await page.getByRole("combobox", { name: "Pick-up location" }).click();
-  await page.getByRole("option", { name: "Downtown" }).click();
-  await pickDates(page, 2, 4);
-  await page.getByRole("button", { name: "Find cars" }).click();
-  await expect(page.getByText("Choose where to return the car")).toBeVisible();
-  await page.getByRole("combobox", { name: "Return location" }).click();
-  await page.getByRole("option", { name: "Airport Terminal" }).click();
-  await page.getByRole("button", { name: "Find cars" }).click();
-  await expect(page).toHaveURL(/returnLocation=loc-airport/);
-});
-
-test("date picker is custom, blocks past days, and offers quick durations", async ({ page }) => {
+test("date picker is custom and blocks past days", async ({ page }) => {
   await page.goto("/");
   await page.waitForLoadState("networkidle");
   await expect(page.locator('input[type="date"]')).toHaveCount(0);
 
   await page.locator("#returnDate").click();
-  await expect(page.getByText("Select your rental dates").first()).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Select your rental dates" })).toBeVisible();
   const yesterday = page.locator(`td[data-day="${futureDate(-1)}"]`).first();
   if (await yesterday.count()) {
     await expect(yesterday).toHaveAttribute("data-disabled", "true");
@@ -246,16 +229,16 @@ test("date picker is custom, blocks past days, and offers quick durations", asyn
     await expect(page.locator("#pickupDate")).toContainText("Add date");
   }
 
-  await page.getByRole("button", { name: "1 week" }).click();
-  await expect(page.getByText("Rental length: 7 days").first()).toBeVisible();
+  await page.locator(`[data-day="${futureDate(2)}"]`).first().click();
+  await page.locator(`[data-day="${futureDate(9)}"]`).first().click();
+  await expect(page.locator("[data-rental-length]")).toHaveText("Rental length: 7 days");
 
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Select your rental dates" })).toHaveCount(0);
+
+  // Times sit next to each date, outside the picker.
   await page.getByRole("combobox", { name: "Return time" }).click();
   await page.getByRole("option", { name: "18:00" }).click();
-  await expect(page.getByText("Rental length: 7 days 8 hours").first()).toBeVisible();
-
-  // Let the time list finish closing so Escape goes to the picker, not the list.
-  await expect(page.getByRole("listbox")).toHaveCount(0);
-  await page.keyboard.press("Escape");
-  await expect(page.getByText("Select your rental dates")).toHaveCount(0);
-  await expect(page.locator("#returnDate")).toContainText("18:00");
+  await expect(page.locator("[data-rental-length]")).toHaveText("Rental length: 7 days 8 hours");
+  await expect(page.getByRole("combobox", { name: "Return time" })).toContainText("18:00");
 });

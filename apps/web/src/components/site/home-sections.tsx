@@ -16,7 +16,7 @@ import {
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/catalog/money";
-import type { WeeklySaving } from "@/lib/catalog/queries";
+import type { CategorySummary, WeeklySaving } from "@/lib/catalog/queries";
 import type { DriverProfile, Location, SampleReview } from "@/lib/catalog/types";
 import { categoryLinks } from "@/lib/site-config";
 
@@ -60,47 +60,69 @@ const VALUES = [
   { Icon: ShieldCheckIcon, title: "Deposit kept separate", body: "Refundable, and never counted as rental price." },
 ];
 
+/** Hairline dividers for a 1-column (phone), 2×2 (sm) and 4-column (lg) grid. */
+const VALUE_DIVIDERS = [
+  "",
+  "border-t sm:border-t-0 sm:border-l",
+  "border-t lg:border-t-0 lg:border-l",
+  "border-t sm:border-l lg:border-t-0",
+];
+
 export function ValueStrip() {
   return (
-    <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <ul className="grid overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(18,36,27,0.04)] sm:grid-cols-2 lg:grid-cols-4">
       {VALUES.map(({ Icon, title, body }, index) => (
-        <Reveal as="li" key={title} delay={index * 0.08} className="flex gap-3.5">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
-            <Icon aria-hidden="true" className="size-5" />
-          </span>
-          <span>
-            <span className="block font-semibold text-brand-ink">{title}</span>
-            <span className="mt-0.5 block text-sm leading-relaxed text-muted-foreground">{body}</span>
-          </span>
+        <Reveal
+          as="li"
+          key={title}
+          delay={index * 0.08}
+          className={`border-border p-6 lg:p-7 ${VALUE_DIVIDERS[index] ?? ""}`}
+        >
+          <p className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight text-brand-ink">
+            <Icon aria-hidden="true" strokeWidth={1.75} className="size-[18px] shrink-0 text-primary" />
+            {title}
+          </p>
+          <p className="mt-2.5 text-sm leading-relaxed text-pretty text-muted-foreground">
+            {body}
+          </p>
         </Reveal>
       ))}
     </ul>
   );
 }
 
-export function CategoryGrid() {
+function categorySubtitle(summary: CategorySummary | undefined): string {
+  if (!summary?.fromRate || summary.count === 0) return "Coming soon";
+  const models = `${summary.count} ${summary.count === 1 ? "model" : "models"}`;
+  return `${models} · from ${formatMoney(summary.fromRate, { compact: true })}/day`;
+}
+
+export function CategoryGrid({ summaries }: { summaries: CategorySummary[] }) {
   return (
     <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
       {categoryLinks.map((category, index) => (
         <Reveal as="li" key={category.href} delay={index * 0.05}>
           <Link
             href={category.href}
-            className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-secondary"
+            className="group relative block aspect-[9/10] overflow-hidden rounded-2xl bg-secondary outline-none focus-visible:ring-3 focus-visible:ring-ring/60"
           >
             <Image
               src={category.image}
               alt=""
               fill
               sizes="(min-width: 1024px) 200px, (min-width: 768px) 33vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              style={"imagePosition" in category ? { objectPosition: category.imagePosition } : undefined}
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <span className="absolute inset-0 bg-gradient-to-t from-[rgba(18,36,27,0.85)] via-[rgba(18,36,27,0.15)] to-transparent" />
-            <span className="absolute inset-x-0 bottom-0 flex items-center justify-between p-4 text-white">
-              <span className="text-lg font-semibold">{category.label}</span>
-              <ArrowRightIcon
-                aria-hidden="true"
-                className="size-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
-              />
+            <span className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[rgba(18,36,27,0.92)] via-[rgba(18,36,27,0.45)] to-transparent" />
+            <span className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-black/5 ring-inset" />
+            <span className="absolute inset-x-0 bottom-0 p-4">
+              <span className="block text-lg leading-tight font-semibold tracking-tight text-white">
+                {category.label}
+              </span>
+              <span className="mt-0.5 block truncate text-[11px] text-white/80 sm:text-xs">
+                {categorySubtitle(summaries.find((summary) => summary.href === category.href))}
+              </span>
             </span>
           </Link>
         </Reveal>

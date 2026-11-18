@@ -7,8 +7,6 @@ const schema = createSearchFormSchema(() => NOW);
 const valid = {
   mode: "SELF_DRIVE",
   pickupLocation: "loc-downtown",
-  sameReturn: true,
-  returnLocation: "",
   pickupDate: "2026-12-02",
   pickupTime: "10:00",
   returnDate: "2026-12-05",
@@ -21,7 +19,7 @@ function issuePaths(input: unknown): string[] {
 }
 
 describe("rental search form schema", () => {
-  it("accepts a valid future rental returning to the same location", () => {
+  it("accepts a valid future rental", () => {
     expect(schema.safeParse(valid).success).toBe(true);
   });
 
@@ -31,11 +29,6 @@ describe("rental search form schema", () => {
 
   it("rejects an unknown rental mode", () => {
     expect(issuePaths({ ...valid, mode: "CHAUFFEUR" })).toContain("mode");
-  });
-
-  it("requires a return location only when returning elsewhere", () => {
-    expect(issuePaths({ ...valid, sameReturn: false })).toContain("returnLocation");
-    expect(schema.safeParse({ ...valid, sameReturn: false, returnLocation: "loc-airport" }).success).toBe(true);
   });
 
   it("rejects a pick-up in the past", () => {
