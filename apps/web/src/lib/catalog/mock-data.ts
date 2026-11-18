@@ -396,6 +396,7 @@ export const drivers: DriverProfile[] = [
   {
     id: "drv-karim",
     name: "Karim A.",
+    photo: "/images/drivers/cards/karim.jpg",
     initials: "KA",
     yearsExperience: 12,
     licenseCategory: "B, D1",
@@ -414,6 +415,7 @@ export const drivers: DriverProfile[] = [
   {
     id: "drv-lena",
     name: "Lena M.",
+    photo: "/images/drivers/cards/lena.jpg",
     initials: "LM",
     yearsExperience: 8,
     licenseCategory: "B",
@@ -432,6 +434,7 @@ export const drivers: DriverProfile[] = [
   {
     id: "drv-samuel",
     name: "Samuel O.",
+    photo: "/images/drivers/cards/samuel.jpg",
     initials: "SO",
     yearsExperience: 15,
     licenseCategory: "B, C, D",
@@ -450,6 +453,7 @@ export const drivers: DriverProfile[] = [
   {
     id: "drv-priya",
     name: "Priya S.",
+    photo: "/images/drivers/cards/priya-2.jpg",
     initials: "PS",
     yearsExperience: 6,
     licenseCategory: "B",
@@ -468,6 +472,7 @@ export const drivers: DriverProfile[] = [
   {
     id: "drv-tomas",
     name: "Tomás R.",
+    photo: "/images/drivers/cards/tomas.jpg",
     initials: "TR",
     yearsExperience: 4,
     licenseCategory: "B",

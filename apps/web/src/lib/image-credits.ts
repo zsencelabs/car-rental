@@ -356,5 +356,68 @@ export const imageCredits: ImageCredit[] = [
     "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=131012123",
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  {
+    "file": "/images/drivers/karim.jpg",
+    "title": "Gray-haired man portrait (Unsplash)",
+    "creator": "Foto Sushi (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61874612",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/drivers/priya-2.jpg",
+    "title": "Laughing woman in jean jacket (Unsplash)",
+    "creator": "Brooke Cagle (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61762142",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/drivers/cards/karim.jpg",
+    "title": "Gray-haired man portrait (Unsplash)",
+    "creator": "Foto Sushi (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61874612",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/drivers/cards/priya-2.jpg",
+    "title": "Laughing woman in jean jacket (Unsplash)",
+    "creator": "Brooke Cagle (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61762142",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/drivers/cards/lena.jpg",
+    "title": "Brunette woman portrait (Unsplash)",
+    "creator": "Christopher Campbell (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61654448",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/drivers/cards/samuel.jpg",
+    "title": "Portrait of a man (Unsplash)",
+    "creator": "William Stitt (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61878193",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  {
+    "file": "/images/drivers/cards/tomas.jpg",
+    "title": "Man smiling on steps (Unsplash)",
+    "creator": "Brooke Cagle (Unsplash)",
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=61850347",
+    "license": "CC0 1.0 (public domain)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
   }
 ];

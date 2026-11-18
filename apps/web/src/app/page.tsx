@@ -3,18 +3,17 @@ import { HomeHero } from "@/components/site/home-hero";
 import {
   CategoryGrid,
   Destinations,
-  DriverShowcase,
   PartnerCta,
-  PromoBanner,
+  ListYourCarBanner,
   ReviewsGrid,
   SectionHeading,
   TwoWaysToRent,
   ValueStrip,
 } from "@/components/site/home-sections";
+import { DriverScroller } from "@/components/site/driver-scroller";
 import { HowItWorksStory } from "@/components/site/how-it-works-story";
 import { Reveal } from "@/components/motion/reveal";
 import {
-  getBestWeeklySaving,
   listCategorySummaries,
   listFeaturedDrivers,
   listFeaturedVehicles,
@@ -27,12 +26,11 @@ function Section({ children, className = "" }: { children: React.ReactNode; clas
 }
 
 export default async function HomePage() {
-  const [locations, featured, drivers, reviews, saving, categorySummaries] = await Promise.all([
+  const [locations, featured, drivers, reviews, categorySummaries] = await Promise.all([
     listLocations(),
     listFeaturedVehicles(),
-    listFeaturedDrivers(4),
+    listFeaturedDrivers(6),
     listSampleReviews(),
-    getBestWeeklySaving(),
     listCategorySummaries(),
   ]);
 
@@ -97,17 +95,16 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      <Section className="pb-24">
-        <SectionHeading
-          eyebrow="Independent drivers"
-          title="Meet some of our drivers"
-          description="Sample profiles. Every driver is verified and ranked by performance, not just ratings. You always choose."
-          action={{ href: "/work-with-us/drivers", label: "Become a driver" }}
-        />
-        <div className="mt-10">
-          <DriverShowcase drivers={drivers} />
-        </div>
-      </Section>
+      <DriverScroller
+        drivers={drivers}
+        heading={
+          <SectionHeading
+            eyebrow="Independent drivers"
+            title="Meet some of our drivers"
+            description="Sample profiles. Every driver is verified and ranked by performance, not just ratings. You always choose."
+          />
+        }
+      />
 
       <Section className="pb-24">
         <SectionHeading
@@ -122,7 +119,7 @@ export default async function HomePage() {
       </Section>
 
       <Section className="pb-24">
-        <PromoBanner saving={saving} />
+        <ListYourCarBanner />
       </Section>
 
       <Section className="pb-24">

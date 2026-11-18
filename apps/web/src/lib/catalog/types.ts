@@ -116,6 +116,8 @@ export interface DriverProfile {
   id: string;
   name: string;
   initials: string;
+  /** Sample profile photo for the preview; real drivers upload their own. */
+  photo?: string;
   yearsExperience: number;
   licenseCategory: string;
   languages: string[];

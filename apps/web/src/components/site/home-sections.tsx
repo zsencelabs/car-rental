@@ -5,8 +5,6 @@ import {
   BadgeCheckIcon,
   CarFrontIcon,
   CheckIcon,
-  HandCoinsIcon,
-  LanguagesIcon,
   QuoteIcon,
   ReceiptTextIcon,
   ShieldCheckIcon,
@@ -16,8 +14,8 @@ import {
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/catalog/money";
-import type { CategorySummary, WeeklySaving } from "@/lib/catalog/queries";
-import type { DriverProfile, Location, SampleReview } from "@/lib/catalog/types";
+import type { CategorySummary } from "@/lib/catalog/queries";
+import type { Location, SampleReview } from "@/lib/catalog/types";
 import { categoryLinks } from "@/lib/site-config";
 
 export function SectionHeading({
@@ -190,61 +188,6 @@ export function TwoWaysToRent() {
   );
 }
 
-export function DriverShowcase({ drivers }: { drivers: DriverProfile[] }) {
-  return (
-    <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-      {drivers.map((driver, index) => (
-        <Reveal as="li" key={driver.id} delay={index * 0.08} className="w-[78%] shrink-0 snap-start sm:w-auto">
-          <article className="h-full rounded-[18px] border border-[#e7eae3] bg-card p-5">
-            <div className="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="grid size-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,#3e7054,#63866c)] text-lg font-bold text-white"
-              >
-                {driver.initials}
-              </span>
-              <div>
-                <h3 className="flex items-center gap-1.5 font-semibold text-brand-ink">
-                  {driver.name}
-                  <BadgeCheckIcon aria-label="Verified driver" className="size-4 text-primary" />
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {driver.yearsExperience} yrs · License {driver.licenseCategory}
-                </p>
-              </div>
-            </div>
-            <dl className="mt-5 grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-xl bg-muted py-2">
-                <dt className="text-[0.68rem] text-muted-foreground">Rating</dt>
-                <dd className="flex items-center justify-center gap-1 font-semibold text-brand-ink">
-                  <StarIcon aria-hidden="true" className="size-3.5 fill-[#c9a45c] text-[#c9a45c]" />
-                  {driver.rating.toFixed(1)}
-                </dd>
-              </div>
-              <div className="rounded-xl bg-muted py-2">
-                <dt className="text-[0.68rem] text-muted-foreground">Trips</dt>
-                <dd className="font-semibold text-brand-ink">{driver.completedTrips}</dd>
-              </div>
-              <div className="rounded-xl bg-muted py-2">
-                <dt className="text-[0.68rem] text-muted-foreground">Score</dt>
-                <dd className="font-semibold text-brand-ink">{driver.performanceScore}</dd>
-              </div>
-            </dl>
-            <p className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <LanguagesIcon aria-hidden="true" className="size-3.5" />
-              {driver.languages.join(", ")}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              From <span className="font-semibold text-brand-ink">{formatMoney(driver.dailyRate, { compact: true })}</span>{" "}
-              / day
-            </p>
-          </article>
-        </Reveal>
-      ))}
-    </ul>
-  );
-}
-
 export function Destinations({ locations }: { locations: Location[] }) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -261,10 +204,11 @@ export function Destinations({ locations }: { locations: Location[] }) {
               sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <span className="absolute inset-0 bg-gradient-to-t from-[rgba(15,30,22,0.88)] via-transparent to-transparent" />
-            <span className="absolute inset-x-0 bottom-0 p-5 text-white">
+            <span className="absolute inset-0 bg-[rgba(12,24,18,0.12)]" />
+            <span className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-[rgba(12,24,18,0.95)] via-[rgba(12,24,18,0.7)] to-transparent" />
+            <span className="absolute inset-x-0 bottom-0 p-5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]">
               <span className="block text-xl font-semibold">{location.name}</span>
-              <span className="mt-1 block text-sm text-white/80">{location.description}</span>
+              <span className="mt-1 block text-sm text-white/85">{location.description}</span>
               <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold">
                 See cars here <ArrowRightIcon aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-1" />
               </span>
@@ -276,32 +220,46 @@ export function Destinations({ locations }: { locations: Location[] }) {
   );
 }
 
-export function PromoBanner({ saving }: { saving: WeeklySaving | undefined }) {
+const OWNER_BENEFITS = ["Free to list", "You set the price and availability", "Paid for every trip"];
+
+/** Owner call-to-action: a calm card in the site's style, with headline, three benefits and one button. */
+export function ListYourCarBanner() {
   return (
     <Reveal>
-      <div className="relative overflow-hidden rounded-[24px] bg-primary px-7 py-10 text-primary-foreground sm:px-12 sm:py-12">
-        <div aria-hidden="true" className="absolute -top-20 -right-16 size-72 rounded-full bg-white/10" />
-        <div aria-hidden="true" className="absolute -bottom-24 right-40 size-56 rounded-full bg-white/5" />
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl">
-            <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] text-[#cfe0d2] uppercase">
-              <HandCoinsIcon aria-hidden="true" className="size-4" /> Longer trips, better rates
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-              Weekly and monthly rates on every car.
-            </h2>
-            {saving ? (
-              <p className="mt-3 text-primary-foreground/80">
-                For example, the {saving.vehicle.name} is {formatMoney(saving.vehicle.weeklyRate, { compact: true })} a
-                week, {saving.percent}% less than seven daily rentals.
-              </p>
-            ) : null}
-          </div>
-          <Button asChild size="lg" className="h-12 w-fit bg-white px-6 text-brand-ink hover:bg-white/90">
-            <Link href="/cars?sort=price-asc">
-              Compare rates <ArrowRightIcon aria-hidden="true" />
+      <div className="grid gap-8 rounded-[24px] border border-border bg-card p-8 shadow-[0_1px_2px_rgba(18,36,27,0.04),0_18px_40px_-30px_rgba(18,36,27,0.3)] sm:p-10 lg:grid-cols-[1.3fr_1fr_auto] lg:items-center lg:gap-12">
+        <div>
+          <p className="eyebrow">For owners &amp; rental companies</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-brand-ink sm:text-4xl">
+            Your car can earn <em className="heading-accent">while you don&apos;t.</em>
+          </h2>
+          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+            List it on KAIYA and rent it out on your own terms.
+          </p>
+        </div>
+
+        <ul className="space-y-3 lg:border-l lg:border-border lg:pl-12">
+          {OWNER_BENEFITS.map((benefit) => (
+            <li key={benefit} className="flex items-center gap-2.5 text-sm font-medium text-[#3f5146]">
+              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-secondary text-primary">
+                <CheckIcon aria-hidden="true" className="size-3" strokeWidth={3} />
+              </span>
+              {benefit}
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 lg:flex-col lg:items-stretch lg:text-center">
+          <Button asChild size="lg" className="h-11 rounded-full px-6">
+            <Link href="/work-with-us/providers">
+              List your car <ArrowRightIcon aria-hidden="true" />
             </Link>
           </Button>
+          <Link
+            href="/how-it-works"
+            className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-brand-ink hover:underline"
+          >
+            How it works
+          </Link>
         </div>
       </div>
     </Reveal>
